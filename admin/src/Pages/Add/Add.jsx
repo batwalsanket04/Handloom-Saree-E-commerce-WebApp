@@ -1,3 +1,4 @@
+// src/components/Add.js
 import React, { useState } from "react";
 import { Plus } from "lucide-react";
 import axios from "axios";
@@ -14,13 +15,13 @@ const Add = () => {
     imagePreview: null,
   });
 
-  // Generic input handler
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Image selection handler
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -32,17 +33,19 @@ const Add = () => {
     }));
   };
 
-  // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!formData.Pname || !formData.price) {
       alert("Product Name and Price are required!");
       return;
     }
 
     try {
+      setLoading(true);
+
       const payload = new FormData();
-      payload.append("Pname", formData.Pname);
+      payload.append("name", formData.Pname); // matches backend
       payload.append("description", formData.description);
       payload.append("price", formData.price);
       payload.append("category", formData.category);
@@ -51,6 +54,8 @@ const Add = () => {
       const response = await axios.post(`${url}/api/saree/add`, payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      console.log("Server Response:", response.data);
 
       if (response.data.success) {
         alert("Item added successfully!");
@@ -63,11 +68,16 @@ const Add = () => {
           imagePreview: null,
         });
       } else {
-        alert("Something went wrong!");
+        alert(response.data.message || "Something went wrong!");
       }
     } catch (error) {
-      console.error(error);
-      alert("Server error or URL not reachable");
+      console.error("Axios error:", error.response || error.message);
+      alert(
+        error.response?.data?.message ||
+          "Server error or URL not reachable. Check console."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -154,8 +164,14 @@ const Add = () => {
         </select>
 
         {/* Submit */}
-        <button className="bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition font-medium text-sm">
-          Add Item
+        <button
+          type="submit"
+          disabled={loading}
+          className={`bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition font-medium text-sm ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          {loading ? "Adding..." : "Add Item"}
         </button>
       </form>
     </div>

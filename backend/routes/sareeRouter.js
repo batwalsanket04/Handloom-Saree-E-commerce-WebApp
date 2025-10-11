@@ -1,25 +1,17 @@
-import express from "express"
+// routes/sareeRouter.js
+import express from "express";
+import { addSaree, listSaree, removeSaree } from "../controller/sareeController.js";
+import upload from "../middlewere/uploads/Upload.js";
 
-import { addSaree,listSaree, removeSaree} from "../controller/sareeController.js"
-import multer from "multer"
-import { Upload } from "lucide-react";
+const router = express.Router();
 
+// Add saree with image upload
+router.post("/add", upload.single("image"), addSaree);
 
-const sareeRouter=express.Router();
-//image storage engine
-const storage=multer.diskStorage({
-    destination:"uploads",
-    filename:(req,file,cb)=>{
-       return cb(null,`${Date.now()}${file.originalname}`)
-    }
-})
-const upload=multer({storage:storage})
-sareeRouter.post("/add",upload.single("image"),addSaree)
-sareeRouter.get("/list",listSaree)
-sareeRouter.post("/remove",removeSaree);
+// List sarees
+router.get("/list", listSaree);
 
+// Remove saree
+router.delete("/remove", removeSaree);
 
-
-
-
-export default sareeRouter;
+export default router;

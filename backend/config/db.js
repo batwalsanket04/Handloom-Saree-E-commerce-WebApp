@@ -1,20 +1,18 @@
-import mongoose from "mongoose";
-
 // config/db.js
-  
+import mongoose from "mongoose";
 
 export const connectDB = async () => {
   try {
-    await mongoose.connect(
-      "mongodb+srv://batwalsanket:Sanket%401234@cluster0.4miqrrx.mongodb.net/paithaniSaree?retryWrites=true&w=majority&appName=Cluster0"
+    const conn = await mongoose.connect(
+      "mongodb+srv://batwalsanket:Sanket%401234@cluster0.4miqrrx.mongodb.net/myDatabase?retryWrites=true&w=majority",
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }
     );
-    console.log("MongoDB Connected");
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error("MongoDB connection failed:", error.message);
-   
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
   }
 };
-
- 
-
-
