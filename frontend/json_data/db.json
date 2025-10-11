@@ -1,0 +1,39 @@
+{
+  "Users": [
+    {
+      "name": "sanket batwal",
+      "email": "batwalsanket@gmail.com",
+      "password": "12345678",
+      "id": 1
+    },
+    {
+      "name": "sanket batwal",
+      "email": "batwalsanket@gmail.com",
+      "password": "12345678",
+      "id": 2
+    }
+  ],
+  "Contact": [
+    {
+      "uname": "sanket ",
+      "email": "batwalsanket@gmail.com",
+      "phone": "8805857546",
+      "message": "hello\n",
+      "id": 1
+    }
+  ],
+  "Delivery": [
+    {
+      "fname": "sanket",
+      "lname": "batwal",
+      "uemail": "batwalsanket@gmail.com",
+      "street": "maharashtra",
+      "city": "nashik",
+      "state": "maharastra",
+      "code": "423401",
+      "country": "India",
+      "phone": "08805857546",
+      "id": 1
+    }
+  ]
+}
