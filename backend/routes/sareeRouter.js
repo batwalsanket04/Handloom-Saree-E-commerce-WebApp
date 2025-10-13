@@ -12,6 +12,6 @@ router.post("/add", upload.single("image"), addSaree);
 router.get("/list", listSaree);
 
 // Remove saree
-router.delete("/remove", removeSaree);
+router.delete("/remove/:id", removeSaree);
 
 export default router;

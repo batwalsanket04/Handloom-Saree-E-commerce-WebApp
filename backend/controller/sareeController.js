@@ -36,20 +36,29 @@ export const listSaree = async (req, res) => {
 
 export const removeSaree = async (req, res) => {
   try {
-    const saree = await sareeModel.findById(req.body.id);
-    if (!saree) return res.json({ success: false, message: "Saree not found" });
+    const sareeId = req.params.id;
+    console.log("Saree ID to remove:", sareeId);
 
+    const saree = await sareeModel.findById(sareeId);
+    if (!saree) {
+      return res.json({ success: false, message: "Saree not found" });
+    }
+
+    // Delete the image file if it exists
     if (saree.image) {
-      const filePath = path.join(process.cwd(), "uploads", saree.image);
+      const filePath = path.join(process.cwd(), "images", saree.image);
       fs.unlink(filePath, (err) => {
-        if (err) console.error("Failed to delete image:", err);
+        if (err) console.error("Failed to delete image file:", err);
+        else console.log("Image deleted:", saree.image);
       });
     }
 
-    await sareeModel.findByIdAndDelete(req.body.id);
-    res.json({ success: true, message: "Saree Removed" });
+    //Delete saree from database
+    await sareeModel.findByIdAndDelete(sareeId);
+    res.json({ success: true, message: "Saree removed successfully" });
+
   } catch (error) {
-    console.error(error);
+    console.error("Error removing saree:", error);
     res.json({ success: false, message: "Remove failed" });
   }
 };

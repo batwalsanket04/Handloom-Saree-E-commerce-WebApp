@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Plus } from "lucide-react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Add = () => {
   const url = "http://localhost:4000";
@@ -58,7 +59,7 @@ const Add = () => {
       console.log("Server Response:", response.data);
 
       if (response.data.success) {
-        alert("Item added successfully!");
+       
         setFormData({
           Pname: "",
           price: "",
@@ -67,8 +68,10 @@ const Add = () => {
           imageFile: null,
           imagePreview: null,
         });
+toast.success(response.data.message);
+
       } else {
-        alert(response.data.message || "Something went wrong!");
+        toast.error(response.data.message)
       }
     } catch (error) {
       console.error("Axios error:", error.response || error.message);

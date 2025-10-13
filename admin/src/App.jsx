@@ -5,12 +5,16 @@
  import Add from './Pages/Add/Add';
  import List from './Pages/List/List';
  import Orders from './Pages/Orders/Orders';
+ import { ToastContainer } from 'react-toastify';
+ import "react-toastify/dist/ReactToastify.css";
+ 
   
  
  const App = () => {
    return (
      <>
-      <div className="flex flex-col min-h-screen">
+     <ToastContainer/>
+      <div className="flex flex-col min-h-screen"> 
    <Navbar />
    <div className="flex flex-1">
      <Sidebar />

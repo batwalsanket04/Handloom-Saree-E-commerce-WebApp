@@ -6,7 +6,7 @@ import sareeRouter from "./routes/sareeRouter.js";
 
 const app = express();
 const port = 4000;
-
+app.set("view engine","ejs")
 app.use(express.json());
 app.use(cors());
 app.use("/images", express.static("uploads"));
