@@ -11,16 +11,16 @@ import saree9 from "./Banarasi/saree9.jpeg";
 import saree10 from "./Banarasi/saree10.jpeg";
 
 // Lehengas
-import lehenga1 from "./Lehenga/lehenga.jpg";
-import lehenga2 from "./Lehenga/lehenga2.jpeg";
-import lehenga3 from "./Lehenga/lehenga3.jpeg";
-import lehenga4 from "./Lehenga/lehenga4.jpeg";
-import lehenga5 from "./Lehenga/lehenga5.jpeg";
-import lehenga6 from "./Lehenga/lehenga6.jpeg";
-import lehenga7 from "./Lehenga/lehenga7.jpeg";
-import lehenga8 from "./Lehenga/lehenga8.jpeg";
-import lehenga9 from "./Lehenga/lehenga9.jpeg";
-import lehenga10 from "./Lehenga/lehenga10.jpg";
+import lehenga1 from "./lehenga/lehenga.jpg"
+import lehenga2 from "./lehenga/lehenga2.jpeg";
+import lehenga3 from "./lehenga/lehenga3.jpeg";
+import lehenga4 from "./lehenga/lehenga4.jpeg";
+import lehenga5 from "./lehenga/lehenga5.jpeg";
+import lehenga6 from "./lehenga/lehenga6.jpeg";
+import lehenga7 from "./lehenga/lehenga7.jpeg";
+import lehenga8 from "./lehenga/lehenga8.jpeg";
+import lehenga9 from "./lehenga/lehenga9.jpeg";
+import lehenga10 from "./lehenga/lehenga10.jpg";
 
 // Example extra menu icons/images
 
