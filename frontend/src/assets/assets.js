@@ -139,7 +139,7 @@ export const SareeList2 = [
     img: all2,
     description: "A luxurious brocade saree with intricate golden zari work, perfect for weddings and festive occasions.",
     category:"All-over",
-    price: "₹8,999"
+    price: "8,999"
   },
   {
     id: "2",
@@ -147,7 +147,7 @@ export const SareeList2 = [
     img: saree2,
     description: "Traditional Banarasi silk saree featuring delicate floral motifs and fine weaving craftsmanship.",
     category: "semi-paithani",
-    price: "₹12,500"
+    price: "12,500"
   },
   {
     id: "3",
@@ -155,7 +155,7 @@ export const SareeList2 = [
     img: saree3,
     description: "Handwoven Kanjivaram saree with temple border design, known for its rich silk and durability.",
     category: "semi-paithani",
-    price: "₹15,200"
+    price: "15,200"
   },
   {
     id: "4",
@@ -163,7 +163,7 @@ export const SareeList2 = [
     img: saree4,
     description: "Lightweight Chanderi cotton saree with hand block prints, suitable for casual and office wear.",
     category: "semi-paithani",
-    price: "₹3,200"
+    price: "3,200"
   },
   {
     id: "5",
@@ -171,7 +171,7 @@ export const SareeList2 = [
     img: silk1,
     description: "Exquisite silk saree with double ikat weaving, a true heritage piece for special occasions.",
     category: "silk",
-    price: "₹18,900"
+    price: "18,900"
   },
   {
     id: "6",
@@ -179,7 +179,7 @@ export const SareeList2 = [
     img: brocade5,
     description: "Soft and breathable linen saree with subtle embroidery, perfect for everyday elegance.",
     category: "All-over",
-    price: "₹4,500"
+    price: "4,500"
   },
   {
     id: "7",
@@ -195,14 +195,14 @@ export const SareeList2 = [
     img: butti,
     description: "Soft and breathable Butties saree with subtle embroidery, perfect for everyday elegance.",
     category: "Butti",
-    price: "₹4,500"
+    price: "4,500"
   },{
     id: "9",
     name: " Single Muniya with Parrot Design",
     img: muniya,
     description: "Soft and breathable Muniya saree with subtle embroidery, perfect for everyday elegance.",
     category: "muniya",
-    price: "₹4,500"
+    price: "4,500"
   },
   {
     id: "10",
@@ -210,7 +210,7 @@ export const SareeList2 = [
     img: pickock2,
     description: "Soft and breathable linen saree with subtle embroidery, perfect for everyday elegance.",
     category: "muniya",
-    price: "₹4,500"
+    price: "4,500"
   },
   {
     id: "11",
@@ -218,7 +218,7 @@ export const SareeList2 = [
     img: dupattta,
     description: "Soft and breathable Dupatta with subtle embroidery, perfect for everyday elegance.",
     category: "Dupatta",
-    price: "₹4,500"
+    price: "4,500"
   }
   ,{
     id: "12",
@@ -226,7 +226,7 @@ export const SareeList2 = [
     img: all,
     description: "Soft and breathable Dupatta with subtle embroidery, perfect for everyday elegance.",
     category: "All-over",
-    price: "₹4,500"
+    price: "4,500"
   },
   {
     id: "13",
@@ -234,7 +234,7 @@ export const SareeList2 = [
     img: lehenga2,
     description: "Soft and breathable Zari Weaving  with subtle embroidery, perfect for everyday elegance.",
     category: "lehenga",
-    price: "₹4,500"
+    price: "4,500"
   },
   {
     id: "14",
@@ -242,7 +242,7 @@ export const SareeList2 = [
     img: lehenga3,
     description: "Modern geometric patterns combined with traditional weaving.",
     category: "lehenga",
-    price: "₹4,500"
+    price: "4,500"
   },
   {
     id: "15",
@@ -250,7 +250,7 @@ export const SareeList2 = [
     img: lehenga5,
     description: "Embellished with floral patterns in zari.",
     category: "lehenga",
-    price: "₹4,500"
+    price: "4,500"
   },
   {
     id: "16",
@@ -258,7 +258,7 @@ export const SareeList2 = [
     img: brocade4,
     description: "Soft and breathable linen saree with subtle embroidery, perfect for everyday elegance.",
     category: "All-over",
-    price: "₹4,500"
+    price: "4,500"
   },
   {
     id: "17",
@@ -266,7 +266,7 @@ export const SareeList2 = [
     img: brocade2,
     description: "Soft and breathable linen saree with subtle embroidery, perfect for everyday elegance.",
     category: "All-over",
-    price: "₹4,500"
+    price: "4,500"
   },
   {
     id: "18",
@@ -274,7 +274,7 @@ export const SareeList2 = [
     img: dupatta2,
     description: "Soft and breathable Dupatta  with subtle embroidery, perfect for everyday elegance.",
     category: "Dupatta",
-    price: "₹4,500"
+    price: "4,500"
   },
   {
     id: "19",
@@ -282,7 +282,7 @@ export const SareeList2 = [
     img: dupatta3,
     description: "Soft and breathable linen saree with subtle embroidery, perfect for everyday elegance.",
     category: "Dupatta",
-    price: "₹4,500"
+    price: "4,500"
   },
   {
     id: "20",
@@ -290,7 +290,7 @@ export const SareeList2 = [
     img: muniya2,
     description: "Soft and breathable linen saree with subtle embroidery, perfect for everyday elegance.",
     category: "muniya",
-    price: "₹4,500"
+    price: "4,500"
   },
   {
     id: "21",
@@ -298,7 +298,7 @@ export const SareeList2 = [
     img: muniya3,
     description: "Soft and breathable linen saree with subtle embroidery, perfect for everyday elegance.",
     category: "muniya",
-    price: "₹4,500"
+    price: "4,500"
   },
   {
     id: "22",
@@ -306,13 +306,13 @@ export const SareeList2 = [
     img: butti1,
     description: "Soft and breathable linen saree with subtle embroidery, perfect for everyday elegance.",
     category: "butti",
-    price: "₹4,500"
+    price: "4,500"
   },{
     id: "23",
     name: "Unique butti with royal red",
     img: butti4,
     description: "Soft and breathable linen saree with subtle embroidery, perfect for everyday elegance.",
     category: "butti",
-    price: "₹4,500"
+    price: "4,500"
   },
 ];

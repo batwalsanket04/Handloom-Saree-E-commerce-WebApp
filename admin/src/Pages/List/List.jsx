@@ -1,43 +1,43 @@
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 import { FaTrash } from "react-icons/fa";
 
-import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-
 const List = () => {
-  const url = "http://localhost:4000";
+  const url = "http://localhost:4000"; // Backend URL
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Fetch all sarees from backend
   const fetchList = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${url}/api/saree/list`);
-      if (response.data.success) {
-        setList(response.data.data);
-      } else {
-        toast.error(response.data.message || "Something went wrong");
-      }
-    } catch (error) {
-      console.error("Axios error:", error);
-      toast.error(error.response?.data?.message || error.message || "Server error");
+      const res = await axios.get(`${url}/api/saree/list`);
+      if (res.data.success) setList(res.data.data);
+      else toast.error(res.data.message || "Error fetching list");
+    } catch (err) {
+      console.error(err);
+      toast.error("Server error");
     } finally {
       setLoading(false);
     }
   };
 
-  const removeS=async(sareeId)=>{
-   const response= await axios.delete(`${url}/api/saree/remove/${sareeId}`)
-   await fetchList();
-   if(response.data.success){
-    toast.success( response.data.message);
-
-   }else{
-      toast.error("Error")
-   }
-  
-
-  }
+  // Delete a saree by ID
+  const removeItem = async (_id) => {
+    try {
+      const res = await axios.delete(`${url}/api/saree/remove/${_id}`);
+      if (res.data.success) {
+        toast.success(res.data.message);
+        fetchList(); // Refresh list after deletion
+      } else {
+        toast.error("Failed to delete item");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Server error");
+    }
+  };
 
   useEffect(() => {
     fetchList();
@@ -64,23 +64,25 @@ const List = () => {
             </div>
 
             {/* Table Rows */}
-            {list.map((val, index) => (
+            {list.map((item, index) => (
               <div
                 key={index}
                 className="grid grid-cols-5 gap-4 items-center p-4 border-b border-gray-100 hover:bg-pink-50 transition"
               >
                 <img
-                  src={`${url}/images/${val.image}`}
-                  alt={val.name}
-                  className="w-20 h-20 object-cover rounded-lg"
+                  src={`${url}/images/${item.image}`}
+                  alt={item.name}
+                  className="w-20 h-20 object-cover rounded-lg border border-gray-200"
                 />
-                <p className="text-gray-700 font-medium">{val.name}</p>
-                <p className="text-gray-500">{val.category}</p>
-                <p className="text-gray-700 font-semibold">₹{val.price}</p>
-                <button   onClick={()=>removeS(val._id)} className="text-pink-500 hover:text-red-700 p-1 rounded-full transition">
-  <FaTrash className="w-5 h-5" />
-</button>
-
+                <p className="text-gray-700 font-medium">{item.name}</p>
+                <p className="text-gray-500">{item.category}</p>
+                <p className="text-gray-700 font-semibold">₹{item.price}</p>
+                <button
+                  onClick={() => removeItem(item._id)}
+                  className="text-pink-500 hover:text-red-700 p-2 rounded-full transition"
+                >
+                  <FaTrash className="w-5 h-5" />
+                </button>
               </div>
             ))}
           </div>

@@ -1,4 +1,3 @@
-// src/components/Add.js
 import React, { useState } from "react";
 import { Plus } from "lucide-react";
 import axios from "axios";
@@ -15,7 +14,6 @@ const Add = () => {
     imageFile: null,
     imagePreview: null,
   });
-
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -26,7 +24,6 @@ const Add = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setFormData((prev) => ({
       ...prev,
       imageFile: file,
@@ -36,17 +33,14 @@ const Add = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!formData.Pname || !formData.price) {
-      alert("Product Name and Price are required!");
-      return;
+      return alert("Product Name and Price are required!");
     }
 
     try {
       setLoading(true);
-
       const payload = new FormData();
-      payload.append("name", formData.Pname); // matches backend
+      payload.append("name", formData.Pname);
       payload.append("description", formData.description);
       payload.append("price", formData.price);
       payload.append("category", formData.category);
@@ -56,10 +50,8 @@ const Add = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      console.log("Server Response:", response.data);
-
       if (response.data.success) {
-       
+        toast.success(response.data.message);
         setFormData({
           Pname: "",
           price: "",
@@ -68,17 +60,12 @@ const Add = () => {
           imageFile: null,
           imagePreview: null,
         });
-toast.success(response.data.message);
-
       } else {
-        toast.error(response.data.message)
+        toast.error(response.data.message);
       }
     } catch (error) {
-      console.error("Axios error:", error.response || error.message);
-      alert(
-        error.response?.data?.message ||
-          "Server error or URL not reachable. Check console."
-      );
+      console.error(error);
+      toast.error(error.response?.data?.message || "Server error");
     } finally {
       setLoading(false);
     }
@@ -94,7 +81,6 @@ toast.success(response.data.message);
           Add New Item
         </h2>
 
-        {/* Image Upload */}
         <div className="flex flex-col items-center">
           <p className="text-gray-600 text-sm mb-1">Upload Image</p>
           <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-pink-300 rounded-lg cursor-pointer hover:border-pink-500 hover:bg-pink-50 transition overflow-hidden">
@@ -119,7 +105,6 @@ toast.success(response.data.message);
           </label>
         </div>
 
-        {/* Product Name */}
         <input
           type="text"
           name="Pname"
@@ -128,8 +113,6 @@ toast.success(response.data.message);
           placeholder="Product Name"
           className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-300"
         />
-
-        {/* Price */}
         <input
           type="number"
           name="price"
@@ -140,8 +123,6 @@ toast.success(response.data.message);
           onKeyDown={(e) => e.key === "-" && e.preventDefault()}
           className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-300"
         />
-
-        {/* Description */}
         <textarea
           name="description"
           value={formData.description}
@@ -150,8 +131,6 @@ toast.success(response.data.message);
           rows={3}
           className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-300 resize-none"
         />
-
-        {/* Category */}
         <select
           name="category"
           value={formData.category}
@@ -165,8 +144,6 @@ toast.success(response.data.message);
           <option value="Dupatta">Dupatta</option>
           <option value="Silk">Silk</option>
         </select>
-
-        {/* Submit */}
         <button
           type="submit"
           disabled={loading}

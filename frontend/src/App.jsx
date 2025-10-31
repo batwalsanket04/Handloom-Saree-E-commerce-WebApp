@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { BrowserRouter as Router,Routes,Route} from 'react-router-dom'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
@@ -14,27 +14,32 @@ import About from './componant/About/About'
 import Collection from './componant/Collection/Collection'
 import Contact from './componant/Contact/Contact'
  
+import { context } from './Context/StoreContext'
+import Verify from './pages/Verify/verify'
+import MyOrders from './pages/MyOrders/MyOrders'
+ 
 
 function App() {
   const [count, setCount] = useState(0);
   const [showLogin,setShowLogine]=useState(false);
+  const {token}=useContext(context);
 
 
-   useEffect(()=>
-  {
-    const timer=setTimeout(()=>{
-      setShowLogine(true);
-    },5000)
-    return ()=>clearTimeout(timer);
-    
-  },[])
-
+   useEffect(() => {
+    if(!token){
+  const timer = setTimeout(() => {
+    setShowLogine(true);
+  }, 5000);
+  return () => clearTimeout(timer);
+}
+}, [token]);
 
   return (
     <>
-    {
-      showLogin && <LoginPopUp  setShowLogine={setShowLogine}/> 
-    }
+   {
+  showLogin && !token && <LoginPopUp setShowLogine={setShowLogine}/>
+}
+
     <Router>
       <Navbar setShowLogine={setShowLogine}/>
       <Routes>
@@ -44,6 +49,8 @@ function App() {
         <Route path='/contact' element={<Contact/>}/>
         <Route path='/cart' element={<Cart/>} />
         <Route path='/order' element={<PlaceOrder/>} />
+        <Route path='/verify' element={<Verify/>}/>
+        <Route path='/myorders' element={<MyOrders/>} />
 
         
       </Routes>

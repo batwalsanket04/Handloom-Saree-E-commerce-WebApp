@@ -1,37 +1,38 @@
-import React, { useContext } from 'react'
-import {context} from '../../Context/StoreContext'
-import SareeItem from '../SareeItem/SareeItem'
+import React, { useContext } from "react";
+import { context } from "../../Context/StoreContext";
+import SareeItem from "../SareeItem/SareeItem";
 
-const SareeDisplay = ({category}) => {
- const {SareeList2}=useContext(context)
+const SareeDisplay = ({ category }) => {
+  const { sarees } = useContext(context);
+
+  // ✅ Filter sarees by selected category
+  const filteredSarees =
+    category === "All"
+      ? sarees
+      : sarees.filter(
+          (s) => s.category?.toLowerCase() === category.toLowerCase()
+        );
+
   return (
-
-    <div className=''>
-      <h2 className='mb-5 text-2xl text-justify p-3 w-full  sm:text-2xl sm:mt-[50px]  md:text-6xl md:mt-[20px] lg:text-4xl xl:text-5xl xl:mt-20 font-bold text-pink-600 drop-shadow-lg 
-              2xl:text-7xl'>Top Saree's Near You</h2>
-      <div className='grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-6'>
-        {
-       
-          SareeList2
-           .filter(val=> category===val.category  || category=='All')
-          .map((val,index,)=>(
-
-            <SareeItem
-             key={index} 
-            id={val.id} 
-            name={val.name}
-            img={val.img}
-            description={val.description} 
-            category={val.category}
-            price={val.price}
-             />
-        
-          ))  
-          }
-          
-      </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
+      {filteredSarees.length > 0 ? (
+        filteredSarees.map((s) => (
+          <SareeItem
+            key={s._id}
+            _id={s._id}
+            name={s.name}
+            price={s.price}
+            description={s.description}
+            image={s.image}
+          />
+        ))
+      ) : (
+        <p className="text-center text-gray-500 col-span-4 mt-10">
+          No items found in this category.
+        </p>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default SareeDisplay
+export default SareeDisplay;

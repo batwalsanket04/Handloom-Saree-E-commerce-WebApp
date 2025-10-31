@@ -1,19 +1,18 @@
-import React, { useState } from 'react'
-import Header from '../../componant/Header/Header'
-import ExploreMenu from '../../componant/ExploreMenu/ExploreMenu'
-import FoodDisplay from '../../componant/SareeDisplay/SareeDisplay'
+import React, { useState } from "react";
+import ExploreMenu from "../../componant/ExploreMenu/ExploreMenu";
+import SareeDisplay from "../../componant/SareeDisplay/SareeDisplay";
+import Header from "../../componant/Header/Header";
 
 const Home = () => {
-  const [category,setCategory]=useState('All')
+  const [category, setCategory] = useState("All");
 
-  
   return (
-    <div>
+    <div className="pt-[50px]">
       <Header/>
       <ExploreMenu category={category} setCategory={setCategory} />
-      <FoodDisplay category={category}/>
+      <SareeDisplay category={category} />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
