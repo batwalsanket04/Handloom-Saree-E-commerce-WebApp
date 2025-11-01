@@ -17,23 +17,37 @@ const LoginPopUp = ({ setShowLogine }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const endpoint = currState === "Sign Up" ? `${url}/api/user/register` : `${url}/api/user/login`;
-      const res = await axios.post(endpoint, data);
+  e.preventDefault();
 
-      if (res.data.success) {
-  setToken(res.data.token);  
-  localStorage.setItem("token", res.data.token); // persist
-  setShowLogine(false);
-} else {
-        window.alert(res.data.message);
-      }
-    } catch (err) {
-      console.error(err);
-      window.alert("Error connecting to backend.");
+  try {
+    // clear old token
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    setToken("");
+
+    const endpoint =
+      currState === "Sign Up"
+        ? `${url}/api/user/register`
+        : `${url}/api/user/login`;
+
+    const res = await axios.post(endpoint, data);
+
+    if (res.data.success && res.data.token) {
+      // ✅ Save token in sessionStorage (clears when tab/browser closes or reloads)
+      sessionStorage.setItem("token", res.data.token);
+      setToken(res.data.token);
+
+      setShowLogine(false);
+    } else {
+      window.alert(res.data.message || "Something went wrong!");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    window.alert("Error connecting to backend.");
+  }
+};
+
+
 
   return (
     <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">

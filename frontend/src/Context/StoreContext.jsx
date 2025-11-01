@@ -5,12 +5,14 @@ export const context = createContext(null);
 
  export const StoreContext = ({ children }) => {
   const [sarees, setSarees] = useState([]);
-  const [token, setToken] = useState(() => localStorage.getItem("token") || "");
+  const [token, setToken] = useState(() => sessionStorage.getItem("token") || "");
   const [cartItem, setCartItem] = useState(() => {
-    //  Load saved cart from localStorage on first render
-    const savedCart = localStorage.getItem("cartData");
-    return savedCart ? JSON.parse(savedCart) : {};
-  });
+  //  Only load cart if user is logged in
+  const token = sessionStorage.getItem("token");
+  if (!token) return {}; // no token = logged out user
+  const savedCart = localStorage.getItem("cartData");
+  return savedCart ? JSON.parse(savedCart) : {};
+});
 
   const url = "http://localhost:4000"; // backend URL
 
@@ -67,6 +69,8 @@ export const context = createContext(null);
     }
   };
 
+  
+
   //  Remove from cart
   const removeFromCart = async (id) => {
     setCartItem((prev) => {
@@ -99,10 +103,19 @@ export const context = createContext(null);
   //  Optional: clear everything on logout
   const logout = () => {
     setToken("");
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     setCartItem({});
     localStorage.removeItem("cartData");
   };
+
+
+  useEffect(() => {
+  if (token) {
+    sessionStorage.setItem("token", token);
+  } else {
+    sessionStorage.removeItem("token");
+  }
+}, [token]);  
 
   return (
     <context.Provider
