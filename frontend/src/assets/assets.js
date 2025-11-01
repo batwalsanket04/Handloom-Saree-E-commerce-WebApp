@@ -27,8 +27,8 @@ import lehenga10 from "./lehenga/lehenga10.jpg";
 import pickock from '../assets/pickock2.jpg';
 import pickock2 from '../assets/pickock3.jpg'
 import all from '../assets/All.jpg'
-import jari from '../assets/Zari.jpg'
-import linan from '../assets/zari.jpg'
+ 
+import linan from '../assets/Zari.jpg'
 import butti from '../assets/butti.jpg'
 import piece from '../assets/piece.jpg'
 import dupatta from '../assets/dupatta.jpeg';
