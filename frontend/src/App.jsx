@@ -15,7 +15,7 @@ import Collection from './componant/Collection/Collection'
 import Contact from './componant/Contact/Contact'
  
 import { context } from './Context/StoreContext'
-import Verify from './pages/Verify/verify'
+import Verify from './pages/Verify/Verify'
 import MyOrders from './pages/MyOrders/MyOrders'
  
 
