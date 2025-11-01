@@ -11,7 +11,13 @@ const app = express();
 const port = process.env.PORT || 4000;
 app.set("view engine","ejs")
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin:[
+      "http://localhost:5173", //frontend
+      "http://localhost:5174",//backend c
+  ]
+})
+);
 
 connectDB();
 
