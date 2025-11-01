@@ -1,7 +1,2 @@
-# Admin panel ignores
-node_modules/
-dist/
-build/
-.env
-.vscode/
-.DS_Store
+ node_module
+ .env
