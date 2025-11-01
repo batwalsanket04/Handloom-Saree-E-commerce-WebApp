@@ -8,7 +8,7 @@
  import { ToastContainer } from 'react-toastify';
  import "react-toastify/dist/ReactToastify.css";
  
-   const url = "https://handloom-saree-e-commerce-webapp.onrender.com";
+   const url = "https://handloom-saree-e-commerce-webapp-1-hcwc.onrender.com";
 
  
  const App = () => {
