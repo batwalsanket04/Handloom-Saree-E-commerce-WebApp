@@ -14,7 +14,7 @@ export const context = createContext(null);
   return savedCart ? JSON.parse(savedCart) : {};
 });
 
-  const url = "https://handloom-saree-e-commerce-webapp.onrender.com"; // backend URL
+  const url = "https://handloom-saree-e-commerce-webapp-1-hcwc.onrender.com"; // backend URL
 
   //  Fetch saree list
   useEffect(() => {
