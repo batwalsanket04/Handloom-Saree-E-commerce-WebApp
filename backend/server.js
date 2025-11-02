@@ -11,17 +11,19 @@ const app = express();
 const port = process.env.PORT || 4000;
 app.set("view engine","ejs")
 app.use(express.json());
-app.use(cors({
-  origin: [
-    "http://localhost:5173", // local frontend (Vite dev)
-    "http://localhost:5174", // sometimes used for second instance
-    "http://localhost:5175"
-    "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com", // your Render frontend
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE","OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5174", // local frontend (Vite dev)
+      "http://localhost:5173", //  admin
+      "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com" // your Render frontend
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
 
 app.options("*", cors());
 connectDB();
