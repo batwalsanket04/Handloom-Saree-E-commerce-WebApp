@@ -15,6 +15,7 @@ app.use(cors({
   origin: [
     "http://localhost:5173", // local frontend (Vite dev)
     "http://localhost:5174", // sometimes used for second instance
+    "http://localhost:5175"
     "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com", // your Render frontend
   ],
   methods: ["GET", "POST", "PUT", "DELETE","OPTIONS"],
