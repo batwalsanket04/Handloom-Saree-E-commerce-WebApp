@@ -36,7 +36,7 @@ const addToCart = async (req, res) => {
   }
 };
 
-// ✅ Remove item from cart
+//Remove item from cart
 const removeFromCart = async (req, res) => {
   try {
     const { token } = req.headers;
@@ -65,7 +65,7 @@ const removeFromCart = async (req, res) => {
   }
 };
 
-// ✅ Get user cart
+// Get user cart
 const getCart = async (req, res) => {
   try {
     const { token } = req.headers;
