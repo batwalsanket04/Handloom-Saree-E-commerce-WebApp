@@ -17,10 +17,12 @@ app.use(cors({
     "http://localhost:5174", // sometimes used for second instance
     "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com", // your Render frontend
   ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 }));
 
+app.options("*", cors());
 connectDB();
 
 // API endpoints
