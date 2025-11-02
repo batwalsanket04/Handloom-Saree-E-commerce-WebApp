@@ -12,14 +12,14 @@ const port = process.env.PORT || 4000;
 app.set("view engine","ejs")
 app.use(express.json());
 app.use(cors({
-  origin:[
-      "http://localhost:5173", //frontend
-      "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com",
-      "http://localhost:5174",//backend c
-      "https://handloom-saree-e-commerce-webapp-1-hcwc.onrender.com"
-  ]
-})
-);
+  origin: [
+    "http://localhost:5173", // local frontend (Vite dev)
+    "http://localhost:5174", // sometimes used for second instance
+    "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com", // your Render frontend
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}));
 
 connectDB();
 
