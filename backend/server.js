@@ -14,7 +14,9 @@ app.use(express.json());
 app.use(cors({
   origin:[
       "http://localhost:5173", //frontend
+      "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com",
       "http://localhost:5174",//backend c
+      "https://handloom-saree-e-commerce-webapp-1-hcwc.onrender.com"
   ]
 })
 );
