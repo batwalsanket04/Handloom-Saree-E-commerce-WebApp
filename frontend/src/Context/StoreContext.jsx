@@ -22,6 +22,7 @@ export const context = createContext(null);
     try {
       const res = await axios.get(`${url}/api/saree/list`);
       const sareeData = res.data?.data || res.data?.sarees || [];
+     console.log("Fetched sarees from backend:", sareeData); 
       setSarees(sareeData);
     } catch (err) {
       console.error("Error fetching sarees:", err);
