@@ -18,14 +18,14 @@ app.use(
       "http://localhost:5173", //  admin
       "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com" // your Render frontend
     ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+   
     credentials: true,
   })
 );
 
 
-app.options("*", cors());
+ 
 connectDB();
 
 // API endpoints
