@@ -1,16 +1,58 @@
-# React + Vite
+## Handloom Saree -MERN Stack E-commerce web app
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
+This project is a complete e-commerce saree store built using the MERN stack (HTMl,Tailwind,JavaScript,MongoDB, Express, React, Node.js).
+It includes a frontend for users, a backend API, and a separate admin panel for managing products and orders.
 
-Currently, two official plugins are available:
+The aim was to build a practical online store from scratch with authentication, cart management, and admin controls.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Featurs**
 
-## React Compiler
+## frontend
+-Browse and view all sarees fetched from the backend.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+-Add or remove items from the cart with real-time updates.
 
-## Expanding the ESLint configuration
+-Login/Signup system using JWT authentication.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+-Cart data synced between localStorage and backend for logged-in users.
+
+-Smooth UI built with React and Context API for state management.
+
+ ## Admin Panel
+- Add, edit, and delete sarees.
+
+-Manage all user orders from the dashboard.
+
+-Update order status (Pending → Shipped → Delivered).
+
+-View total sales and product statistics.
+
+## Backend
+-Built with Express and Node.js.
+
+-Handles authentication, product, and order routes.
+
+-Uses MongoDB as the main database.
+
+-JWT used for secure user and admin authentication.
+
+-Stripe payment API integrated (test mode).
+
+# Tech Stack
+**Frontend:** React.js, Axios, Context API, CSS
+- **Backend:** Node.js, Express.js, JWT, Stripe API
+- **Database:** MongoDB
+- **Admin Panel/frontend:** React.js
+- **Version Control:** Git & GitHub
+
+## Folder structure
+
+ paithani_saree
+ |
+ |---Frontend  # user ui(react)
+ |---Admin # admin dashboarrd
+ |---backend #Express API, models, routes, controllers,config,middlewares,route,uploads
+
+ 
+

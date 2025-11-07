@@ -13,14 +13,14 @@ const Navbar = ({ setShowLogine }) => {
 
   // load token on refresh
   useEffect(() => {
-    const savedToken = sessionStorage.getItem("token");
+    const savedToken = localStorage.getItem("token");
     if (savedToken) setToken(savedToken);
   }, [setToken]);
 
   const totalItem = Object.values(cartItem).reduce((sum, qty) => sum + qty, 0);
 
   const handleLogout = () => {
-    sessionStorage.removeItem("token");
+    localStorage.removeItem("token");
     setToken("");
     setCartItem({});
     setShowDropdown(false);

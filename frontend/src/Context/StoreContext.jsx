@@ -5,16 +5,14 @@ export const context = createContext(null);
 
  export const StoreContext = ({ children }) => {
   const [sarees, setSarees] = useState([]);
-  const [token, setToken] = useState(() => sessionStorage.getItem("token") || "");
+  const [token, setToken] = useState(() => localStorage.getItem("token") || "");
   const [cartItem, setCartItem] = useState(() => {
-  //  Only load cart if user is logged in
-  const token = sessionStorage.getItem("token");
-  if (!token) return {}; // no token = logged out user
-  const savedCart = localStorage.getItem("cartData");
-  return savedCart ? JSON.parse(savedCart) : {};
-});
+    //  Load saved cart from localStorage on first render
+    const savedCart = localStorage.getItem("cartData");
+    return savedCart ? JSON.parse(savedCart) : {};
+  });
 
-  const url = "https://handloom-saree-e-commerce-webapp-1-hcwc.onrender.com"; // backend URL
+  const url = "http://localhost:4000"; // backend URL
 
   //  Fetch saree list
   useEffect(() => {
@@ -22,7 +20,6 @@ export const context = createContext(null);
     try {
       const res = await axios.get(`${url}/api/saree/list`);
       const sareeData = res.data?.data || res.data?.sarees || [];
-     console.log("Fetched sarees from backend:", sareeData); 
       setSarees(sareeData);
     } catch (err) {
       console.error("Error fetching sarees:", err);
@@ -70,8 +67,6 @@ export const context = createContext(null);
     }
   };
 
-  
-
   //  Remove from cart
   const removeFromCart = async (id) => {
     setCartItem((prev) => {
@@ -104,19 +99,10 @@ export const context = createContext(null);
   //  Optional: clear everything on logout
   const logout = () => {
     setToken("");
-    sessionStorage.removeItem("token");
+    localStorage.removeItem("token");
     setCartItem({});
     localStorage.removeItem("cartData");
   };
-
-
-  useEffect(() => {
-  if (token) {
-    sessionStorage.setItem("token", token);
-  } else {
-    sessionStorage.removeItem("token");
-  }
-}, [token]);  
 
   return (
     <context.Provider
