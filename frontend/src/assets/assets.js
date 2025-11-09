@@ -28,7 +28,7 @@ import pickock from '../assets/pickock2.jpg';
 import pickock2 from '../assets/pickock3.jpg'
 import all from '../assets/All.jpg'
  
-import linan from '../assets/zari.jpg'
+import linan from '../assets/ari.jpg'
 import butti from '../assets/butti.jpg'
 import piece from '../assets/piece.jpg'
 import dupatta from '../assets/dupatta.jpeg';
