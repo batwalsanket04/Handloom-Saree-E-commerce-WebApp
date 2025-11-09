@@ -11,7 +11,7 @@ const ExploreMenu = ({ category, setCategory }) => {
         Explore our collection of crafted pieces made to match your style and story.
       </p>
 
-      <div className="explore-list flex items-center gap-6  overflow-y-hidden p-4">
+      <div className="explore-list flex justify-center gap-6  overflow-y-hidden p-4">
         {SareeList.map((val, index) => (
           <div
             key={index}

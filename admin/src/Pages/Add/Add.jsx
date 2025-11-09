@@ -137,12 +137,12 @@ const Add = () => {
           onChange={handleChange}
           className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-300 bg-white"
         >
-          <option value="All-Over">All-Over</option>
+          <option value="All-Over">Brocade</option>
           <option value="Muniya">Muniya</option>
           <option value="Lehenga">Lehenga</option>
           <option value="Butti">Butti</option>
           <option value="Dupatta">Dupatta</option>
-          <option value="Silk">Silk</option>
+          <option value="BlausPiece">Blaus Piece</option>
         </select>
         <button
           type="submit"
