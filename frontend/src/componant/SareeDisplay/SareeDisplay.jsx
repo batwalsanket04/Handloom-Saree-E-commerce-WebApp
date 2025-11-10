@@ -5,7 +5,6 @@ import SareeItem from "../SareeItem/SareeItem";
 const SareeDisplay = ({ category }) => {
   const { sarees } = useContext(context);
 
-  // ✅ Filter sarees by selected category
   const filteredSarees =
     category === "All"
       ? sarees
