@@ -11,20 +11,28 @@ const app = express();
 const port = process.env.PORT || 4000;
 app.set("view engine","ejs")
 app.use(express.json());
+
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com",
+  "https://handloom-saree-e-commerce-webapp-2-admin2.onrender.com",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5174", // local frontend (Vite dev)
-      "http://localhost:5173", //  admin
-      "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com", // your Render frontend
-      "https://handloom-saree-e-commerce-webapp-2-admin2.onrender.com" // Admin Render URL
-    ],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS: " + origin));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
-   
     credentials: true,
   })
 );
-
 
  
 connectDB();
