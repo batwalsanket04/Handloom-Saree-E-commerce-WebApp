@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { FaTrash } from "react-icons/fa";
 
 const List = () => {
-  const url = "http://localhost:4000"; // Backend URL
+  const url = "https://handloom-saree-e-commerce-webapp-1-hcwc.onrender.com"; // Backend URL
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
 
