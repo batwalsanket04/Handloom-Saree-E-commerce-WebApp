@@ -16,7 +16,8 @@ app.use(
     origin: [
       "http://localhost:5174", // local frontend (Vite dev)
       "http://localhost:5173", //  admin
-      "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com" // your Render frontend
+      "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com", // your Render frontend
+      "https://handloom-saree-e-commerce-webapp-2-admin2.onrender.com" // Admin Render URL
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
    
