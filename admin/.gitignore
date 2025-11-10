@@ -1,1 +1,49 @@
-node_modules
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+
+# Build output
+dist/
+build/
+*.local
+
+# Vite cache
+.vite/
+vite.config.timestamp-*
+vite.config.*
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+*.log.*
+*.out
+*.pid
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+
+# Render / deployment cache
+.cache/
+.vercel/
+.netlify/
+
+# Misc
+temp/
+tmp/
+coverage/
