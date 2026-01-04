@@ -12,53 +12,50 @@ const ExploreMenu = ({ category, setCategory }) => {
         Explore our collection of crafted pieces made to match your style and story.
       </p>
 
-      <div className="explore-list flex justify-center gap-6 overflow-y-hidden p-4">
+      <div className="explore-list flex gap-5 px-6 py-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
 
-        {/* 🔹 ALL BUTTON */}
-        <div
-          onClick={() => setCategory("All")}
-          className={`flex-shrink-0 w-[160px] h-[210px] bg-white shadow-md rounded-2xl overflow-hidden cursor-pointer transition-transform duration-300 hover:scale-105 ${
-            category === "All"
-              ? "border-2 border-pink-600 shadow-lg"
-              : ""
-          }`}
-        >
-          <div className="w-full h-[130px] flex items-center justify-center bg-pink-50">
-            <span className="text-4xl font-bold text-pink-600">All</span>
-          </div>
-          <div className="p-2 flex justify-center items-center h-[80px]">
-            <p className="font-semibold text-lg text-gray-800">All Sarees</p>
-          </div>
-        </div>
+  {/* 🔹 ALL BUTTON */}
+  <div
+    onClick={() => setCategory("All")}
+    className={`flex-shrink-0 w-[180px] h-[230px] bg-white shadow rounded-2xl overflow-hidden cursor-pointer snap-center transition-transform duration-300 hover:scale-105 ${
+      category === "All" ? "border-2 border-pink-600 shadow-lg" : ""
+    }`}
+  >
+    <div className="w-full h-[140px] flex items-center justify-center bg-pink-50">
+      <span className="text-4xl font-bold text-pink-600">All</span>
+    </div>
+    <div className="p-2 flex justify-center items-center h-[90px]">
+      <p className="font-semibold text-lg text-gray-800">All Sarees</p>
+    </div>
+  </div>
 
-        {/* 🔹 CATEGORY BUTTONS */}
-        {SareeList.map((val, index) => (
-          <div
-            key={index}
-            onClick={() =>
-              setCategory((prev) =>
-                prev === val.category ? "All" : val.category
-              )
-            }
-            className={`flex-shrink-0 w-[160px] h-[210px] bg-white shadow-md rounded-2xl overflow-hidden cursor-pointer transition-transform duration-300 hover:scale-105 ${
-              category === val.category
-                ? "border-2 border-pink-600 shadow-lg"
-                : ""
-            }`}
-          >
-            <img
-              src={val.Menuimg}
-              alt={val.menuName}
-              className="w-full h-[130px] object-cover"
-            />
-            <div className="p-2 flex justify-center items-center h-[80px]">
-              <p className="font-semibold text-lg text-gray-800">
-                {val.menuName}
-              </p>
-            </div>
-          </div>
-        ))}
+  {/* 🔹 CATEGORY BUTTONS */}
+  {SareeList.map((val, index) => (
+    <div
+      key={index}
+      onClick={() =>
+        setCategory(prev =>
+          prev === val.category ? "All" : val.category
+        )
+      }
+      className={`flex-shrink-0 w-[180px] h-[230px] bg-white shadow rounded-2xl overflow-hidden cursor-pointer snap-center transition-transform duration-300 hover:scale-105 ${
+        category === val.category ? "border-2 border-pink-600 shadow-lg" : ""
+      }`}
+    >
+      <img
+        src={val.Menuimg}
+        alt={val.menuName}
+        className="w-full h-[140px] object-cover"
+      />
+      <div className="p-2 flex justify-center items-center h-[90px]">
+        <p className="font-semibold text-lg text-gray-800">
+          {val.menuName}
+        </p>
       </div>
+    </div>
+  ))}
+</div>
+
     </div>
   );
 };
