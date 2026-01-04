@@ -69,21 +69,21 @@ const removeFromCart = async (req, res) => {
 const getCart = async (req, res) => {
   try {
     const { token } = req.headers;
-
-    if (!token) {
-      return res.json({ success: false, message: "No token provided" });
-    }
+    if (!token) return res.json({ success: false, cartData: {} });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
+    const user = await userModel.findById(decoded.id);
 
-    let userData = await userModel.findById(userId);
-    res.json({ success: true, cartData: userData.cartData });
-  } catch (error) {
-    console.error(error);
-    res.json({ success: false, message: "Error fetching cart" });
+    if (!user) {
+      return res.json({ success: false, cartData: {} });
+    }
+
+    res.json({ success: true, cartData: user.cartData || {} });
+  } catch (err) {
+    res.json({ success: false, cartData: {} });
   }
 };
+
 
 
 export { addToCart, removeFromCart, getCart };

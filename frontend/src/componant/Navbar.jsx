@@ -13,19 +13,35 @@ const Navbar = ({ setShowLogine }) => {
 
   // load token on refresh
   useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    if (savedToken) setToken(savedToken);
-  }, [setToken]);
+  const token = localStorage.getItem("token");
+
+  if (!token) return setToken("");
+
+  fetch("http://localhost:5000/api/verify", {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.valid) {
+        localStorage.removeItem("token");
+        setToken("");
+      } else {
+        setToken(token);
+      }
+    });
+}, []);
+
 
   const totalItem = Object.values(cartItem).reduce((sum, qty) => sum + qty, 0);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setToken("");
-    setCartItem({});
-    setShowDropdown(false);
-    nav("/");
-  };
+  localStorage.removeItem("token");
+  localStorage.removeItem("cartItem");
+  setToken("");
+  setCartItem({});
+  nav("/");
+};
+
 
   return (
     <nav className="bg-white shadow-md fixed w-full top-0 left-0 z-50">

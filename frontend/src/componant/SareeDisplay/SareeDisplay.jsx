@@ -1,6 +1,8 @@
 import React, { useContext } from "react";
 import { context } from "../../Context/StoreContext";
 import SareeItem from "../SareeItem/SareeItem";
+import { FaBoxOpen } from "react-icons/fa";
+
 
 const SareeDisplay = ({ category }) => {
   const { sarees } = useContext(context);
@@ -14,22 +16,25 @@ const SareeDisplay = ({ category }) => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
-      {filteredSarees.length > 0 ? (
-        filteredSarees.map((s) => (
-          <SareeItem
-            key={s._id}
-            _id={s._id}
-            name={s.name}
-            price={s.price}
-            description={s.description}
-            image={s.image}
-          />
-        ))
-      ) : (
-        <p className="text-center text-gray-500 col-span-4 mt-10">
-          No items found in this category.
-        </p>
-      )}
+     {filteredSarees.length > 0 ? (
+  filteredSarees.map((s) => (
+    <SareeItem
+      key={s._id}
+      _id={s._id}
+      name={s.name}
+      price={s.price}
+      description={s.description}
+      image={s.image}
+    />
+  ))
+) : (
+  <div className="col-span-full flex flex-col items-center justify-center mt-12 text-gray-500">
+    <FaBoxOpen className="text-5xl mb-3 opacity-60" />
+    <p className="text-lg font-medium">No items found</p>
+    <p className="text-sm">Try selecting another category</p>
+  </div>
+)}
+
     </div>
   );
 };

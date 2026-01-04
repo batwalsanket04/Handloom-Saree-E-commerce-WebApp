@@ -8,12 +8,16 @@ const Cart = () => {
   const { cartItem, sarees, addToCart, removeFromCart, url } = useContext(context);
 
   // Map cart items to full product details
-  const cartProducts = Object.keys(cartItem)
-    .map((id) => {
-      const product = sarees.find((s) => s._id === id); // use _id
-      return product ? { ...product, quantity: cartItem[id] } : null;
-    })
-    .filter(Boolean);
+ const cartProducts =
+  sarees.length === 0
+    ? []
+    : Object.keys(cartItem)
+        .map(id => {
+          const product = sarees.find(s => s._id === id);
+          return product ? { ...product, quantity: cartItem[id] } : null;
+        })
+        .filter(Boolean);
+
 
   // Calculate totals
   const subtotal = cartProducts.reduce((acc, p) => acc + p.price * p.quantity, 0);

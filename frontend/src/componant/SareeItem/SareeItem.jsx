@@ -8,11 +8,13 @@ const SareeItem = ({ _id, name, price, description, image }) => {
   return (
     <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition overflow-hidden flex flex-col">
       <div className="relative w-full h-60">
-        <img
-          src={image ? `${url}/images/${image}` : "/placeholder.jpg"}
-          alt={name}
-          className="w-full h-full object-cover"
-        />
+       <img
+  src={`${url}/images/${image}`}
+  alt={name}
+  onError={(e) => (e.target.src = "/placeholder.jpg")}
+  className="w-full h-full object-cover"
+/>
+
 
         {!cartItem[_id] ? (
           <button
