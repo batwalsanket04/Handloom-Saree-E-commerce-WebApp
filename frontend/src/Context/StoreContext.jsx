@@ -23,7 +23,7 @@ export const StoreContext = ({ children }) => {
     fetchSarees();
   }, []);
 
-  // 🔹 Load cart from backend (ONLY once per login)
+  // Load cart from backend (ONLY once per login)
   const loadCartData = async () => {
   if (!token) {
     setCartItem({});
@@ -38,11 +38,11 @@ export const StoreContext = ({ children }) => {
     if (res.data.success) {
       setCartItem(res.data.cartData || {});
     } else {
-      logout(); // 👈 force logout if backend rejects token
+      logout(); //  force logout if backend rejects token
     }
   } catch (err) {
     console.error("Cart load error:", err);
-    logout(); // 👈 token invalid / expired
+    logout(); //  token invalid / expired
   }
 };
 
@@ -84,7 +84,14 @@ export const StoreContext = ({ children }) => {
       0
     );
 
-  // 🔹 Logout
+    const logout = () => {
+  localStorage.removeItem("token");
+  setToken("");
+  setCartItem({});
+};
+
+
+  
  useEffect(() => {
   if (!localStorage.getItem("token")) {
     setToken("");
@@ -104,7 +111,7 @@ export const StoreContext = ({ children }) => {
         token,
         setToken,
         getTotalCartAmount,
-        logout,
+         logout
       }}
     >
       {children}
