@@ -25,26 +25,27 @@ export const StoreContext = ({ children }) => {
 
   // 🔹 Load cart from backend (ONLY once per login)
   const loadCartData = async () => {
-    if (!token) {
-      setCartItem({});
-      return;
-    }
+  if (!token) {
+    setCartItem({});
+    return;
+  }
 
-    try {
-      const res = await axios.get(`${url}/api/cart/get`, {
-        headers: { token },
-      });
+  try {
+    const res = await axios.get(`${url}/api/cart/get`, {
+      headers: { token },
+    });
 
-      if (res.data.success) {
-        setCartItem(res.data.cartData || {});
-      } else {
-        setCartItem({});
-      }
-    } catch (err) {
-      console.error("Cart load error:", err);
-      setCartItem({});
+    if (res.data.success) {
+      setCartItem(res.data.cartData || {});
+    } else {
+      logout(); // 👈 force logout if backend rejects token
     }
-  };
+  } catch (err) {
+    console.error("Cart load error:", err);
+    logout(); // 👈 token invalid / expired
+  }
+};
+
 
   useEffect(() => {
     loadCartData();
@@ -52,26 +53,29 @@ export const StoreContext = ({ children }) => {
 
   // 🔹 Add to cart
   const addToCart = async (id) => {
-    setCartItem((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+  if (!token) return;
 
-    if (token) {
-      await axios.post(`${url}/api/cart/add`, { id }, { headers: { token } });
-    }
-  };
+  setCartItem((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+  await axios.post(`${url}/api/cart/add`, { id }, { headers: { token } });
+};
+
 
   // 🔹 Remove from cart
-  const removeFromCart = async (id) => {
-    setCartItem((prev) => {
-      const updated = { ...prev };
-      if (updated[id] > 1) updated[id]--;
-      else delete updated[id];
-      return updated;
-    });
+ const removeFromCart = async (id) => {
+  if (!token) return;
 
-    if (token) {
-      await axios.post(`${url}/api/cart/remove`, { id }, { headers: { token } });
-    }
-  };
+  setCartItem((prev) => {
+    const updated = { ...prev };
+    if (updated[id] > 1) updated[id]--;
+    else delete updated[id];
+    return updated;
+  });
+
+  await axios.post(`${url}/api/cart/remove`, { id }, { headers: { token } });
+};
+
+
+   
 
   // 🔹 Total amount
   const getTotalCartAmount = () =>
@@ -81,11 +85,13 @@ export const StoreContext = ({ children }) => {
     );
 
   // 🔹 Logout
-  const logout = () => {
-    localStorage.removeItem("token");
+ useEffect(() => {
+  if (!localStorage.getItem("token")) {
     setToken("");
     setCartItem({});
-  };
+  }
+}, []);
+
 
   return (
     <context.Provider
