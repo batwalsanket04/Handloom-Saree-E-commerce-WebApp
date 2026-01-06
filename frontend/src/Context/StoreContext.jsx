@@ -5,6 +5,7 @@ export const context = createContext(null);
 
 export const StoreContext = ({ children }) => {
   const [sarees, setSarees] = useState([]);
+  const [searchText, setSearchText] = useState("");
   const [token, setToken] = useState(() => localStorage.getItem("token") || "");
   const [cartItem, setCartItem] = useState({});
 
@@ -24,7 +25,7 @@ export const StoreContext = ({ children }) => {
   }, []);
 
   // Load cart from backend (ONLY once per login)
-  const loadCartData = async () => {
+ const loadCartData = async () => {
   if (!token) {
     setCartItem({});
     return;
@@ -32,19 +33,27 @@ export const StoreContext = ({ children }) => {
 
   try {
     const res = await axios.get(`${url}/api/cart/get`, {
-      headers: { token },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (res.data.success) {
       setCartItem(res.data.cartData || {});
     } else {
-      logout(); //  force logout if backend rejects token
+      setCartItem({});  
     }
   } catch (err) {
     console.error("Cart load error:", err);
-    logout(); //  token invalid / expired
+    setCartItem({});  
   }
 };
+
+const filteredSarees = sarees.filter((item) =>
+  item.name.toLowerCase().includes(searchText.toLowerCase()) ||
+  item.category?.toLowerCase().includes(searchText.toLowerCase())
+);
+
 
 
   useEffect(() => {
@@ -56,7 +65,16 @@ export const StoreContext = ({ children }) => {
   if (!token) return;
 
   setCartItem((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
-  await axios.post(`${url}/api/cart/add`, { id }, { headers: { token } });
+ await axios.post(
+  `${url}/api/cart/add`,
+  { id },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
 };
 
 
@@ -71,13 +89,22 @@ export const StoreContext = ({ children }) => {
     return updated;
   });
 
-  await axios.post(`${url}/api/cart/remove`, { id }, { headers: { token } });
+ await axios.post(
+  `${url}/api/cart/remove`,
+  { id },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
 };
 
 
    
 
-  // 🔹 Total amount
+  //  Total amount
   const getTotalCartAmount = () =>
     sarees.reduce(
       (acc, item) => acc + (cartItem[item._id] || 0) * item.price,
@@ -92,12 +119,7 @@ export const StoreContext = ({ children }) => {
 
 
   
- useEffect(() => {
-  if (!localStorage.getItem("token")) {
-    setToken("");
-    setCartItem({});
-  }
-}, []);
+  
 
 
   return (
@@ -107,6 +129,9 @@ export const StoreContext = ({ children }) => {
         cartItem,
         addToCart,
         removeFromCart,
+         filteredSarees,  
+    searchText,       
+    setSearchText, 
         url,
         token,
         setToken,
