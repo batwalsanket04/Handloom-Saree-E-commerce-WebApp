@@ -3,9 +3,10 @@ import React, { useContext, useState } from "react";
 import axios from "axios";
  import { context } from "../../Context/StoreContext";
 import { FaXmark } from "react-icons/fa6";
+import { toast } from "react-toastify";
 
 const LoginPopUp = ({ setShowLogine }) => {
-  const { setToken, url } = useContext(context);
+ const { setToken, setUser, url } = useContext(context);
   const [currState, setCurrState] = useState("Sign Up");
   const [data, setData] = useState({ name: "", email: "", password: "" });
 
@@ -22,16 +23,23 @@ const LoginPopUp = ({ setShowLogine }) => {
       const endpoint = currState === "Sign Up" ? `${url}/api/user/register` : `${url}/api/user/login`;
       const res = await axios.post(endpoint, data);
 
-      if (res.data.success) {
-  setToken(res.data.token);  
-  localStorage.setItem("token", res.data.token); // persist
+   if (res.data.success) {
+  setToken(res.data.token);
+  localStorage.setItem("token", res.data.token);
+
+  if (res.data.user) {
+    setUser(res.data.user);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+  }
+
   setShowLogine(false);
 } else {
-        window.alert(res.data.message);
-      }
+  toast.error(res.data.message);
+}
+
     } catch (err) {
       console.error(err);
-      window.alert("Error connecting to backend.");
+     toast.error("Server Error");
     }
   };
 

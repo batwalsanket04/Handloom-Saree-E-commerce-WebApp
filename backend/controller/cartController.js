@@ -1,34 +1,22 @@
-import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
 
-//  Add item to cart
+// ADD TO CART
 const addToCart = async (req, res) => {
   try {
-    const { token } = req.headers; // token from frontend
-    const { id } = req.body; // product ID from frontend
+    const { id } = req.body;
+    const userId = req.userId;
 
-    if (!token) {
-      return res.json({ success: false, message: "No token provided" });
-    }
-
-    // decode token to get user ID
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
-
-    let userData = await userModel.findById(userId);
+    const userData = await userModel.findById(userId);
     if (!userData) {
       return res.json({ success: false, message: "User not found" });
     }
 
     let cartData = userData.cartData || {};
 
-    if (!cartData[id]) {
-      cartData[id] = 1;
-    } else {
-      cartData[id] += 1;
-    }
+    cartData[id] = (cartData[id] || 0) + 1;
 
     await userModel.findByIdAndUpdate(userId, { cartData });
+
     res.json({ success: true, message: "Added to cart" });
   } catch (error) {
     console.error(error);
@@ -36,28 +24,22 @@ const addToCart = async (req, res) => {
   }
 };
 
-//Remove item from cart
+// REMOVE FROM CART
 const removeFromCart = async (req, res) => {
   try {
-    const { token } = req.headers;
     const { id } = req.body;
+    const userId = req.userId;
 
-    if (!token) {
-      return res.json({ success: false, message: "No token provided" });
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
-
-    let userData = await userModel.findById(userId);
+    const userData = await userModel.findById(userId);
     let cartData = userData.cartData || {};
 
-    if (cartData[id] > 0) {
+    if (cartData[id]) {
       cartData[id] -= 1;
-      if (cartData[id] === 0) delete cartData[id];
+      if (cartData[id] <= 0) delete cartData[id];
     }
 
     await userModel.findByIdAndUpdate(userId, { cartData });
+
     res.json({ success: true, message: "Removed from cart" });
   } catch (error) {
     console.error(error);
@@ -65,25 +47,15 @@ const removeFromCart = async (req, res) => {
   }
 };
 
-// Get user cart
+// GET CART
 const getCart = async (req, res) => {
   try {
-    const { token } = req.headers;
-    if (!token) return res.json({ success: false, cartData: {} });
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await userModel.findById(decoded.id);
-
-    if (!user) {
-      return res.json({ success: false, cartData: {} });
-    }
-
-    res.json({ success: true, cartData: user.cartData || {} });
-  } catch (err) {
+    const user = await userModel.findById(req.userId);
+    res.json({ success: true, cartData:user});
+  
+  } catch (error) {
     res.json({ success: false, cartData: {} });
   }
 };
-
-
 
 export { addToCart, removeFromCart, getCart };

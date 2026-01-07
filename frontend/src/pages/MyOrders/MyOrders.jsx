@@ -6,18 +6,16 @@ const MyOrders = () => {
   const { url, token } = useContext(context);
   const [data, setData] = useState([]);
 
-  const fetchOrders = async () => {
-    try {
-      const response = await axios.post(
-        `${url}/api/order/userorders`,
-        {},
-        { headers: { token } }
-      );
-      setData(response.data.data || []);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    }
-  };
+ const fetchOrders = async () => {
+  const res = await axios.post(
+    `${url}/api/order/userorders`,
+    {},
+    { headers: { token } }
+  );
+  setData(res.data.data || []);
+};
+
+
 
  useEffect(() => {
   if (!token) return;

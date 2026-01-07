@@ -1,11 +1,11 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { context } from "../../Context/StoreContext";
 import { FaTrash } from "react-icons/fa";
 
 const Cart = () => {
   const nav = useNavigate();
-  const { cartItem, sarees, addToCart, removeFromCart, url } = useContext(context);
+  const { cartItem, sarees, addToCart, removeFromCart, url,loadCartData } = useContext(context);
 
   // Map cart items to full product details
  const cartProducts =
@@ -23,7 +23,10 @@ const Cart = () => {
   const subtotal = cartProducts.reduce((acc, p) => acc + p.price * p.quantity, 0);
   const delivery = subtotal === 0 ? 0 : 180;
   const total = subtotal + delivery;
+  console.log(cartProducts)
 
+
+ 
   return (
     <div className="cart pt-[100px] min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-2xl">

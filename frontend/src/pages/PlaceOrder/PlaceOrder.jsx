@@ -57,9 +57,12 @@ const PlaceOrder = () => {
 
     if (paymentMethod === "stripe") {
       //  STRIPE PAYMENT
-      const response = await axios.post(`${url}/api/order/place`, orderData, {
-        headers: { token },
-      });
+      const response = await axios.post(
+  `${url}/api/order/place`,
+  orderData,
+  { headers: { token } }
+);
+
 
       if (response.data.success) {
         window.location.replace(response.data.session_url);
@@ -68,9 +71,12 @@ const PlaceOrder = () => {
       }
     } else if (paymentMethod === "cod") {
       //  CASH ON DELIVERY
-      const response = await axios.post(`${url}/api/order/cod`, orderData, {
-        headers: { token },
-      });
+      const response = await axios.post(
+  `${url}/api/order/cod`,
+  orderData,
+  { headers: { token } }
+);
+
 
       if (response.data.success) {
         toast.success("COD order placed successfully!");

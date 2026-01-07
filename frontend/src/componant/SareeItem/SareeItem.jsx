@@ -1,9 +1,14 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { context } from "../../Context/StoreContext";
 import { FaPlus, FaMinus, FaStar, FaStarHalfAlt } from "react-icons/fa";
 
 const SareeItem = ({ _id, name, price, description, image }) => {
   const { cartItem, addToCart, removeFromCart, url } = useContext(context);
+
+ useEffect(() => {
+  localStorage.setItem("CartItem", JSON.stringify(cartItem));
+}, [cartItem]);
+
 
   return (
     <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition overflow-hidden flex flex-col">

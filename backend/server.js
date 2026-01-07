@@ -1,49 +1,30 @@
-// server.js
+
 import express from "express";
+import mongoose from "mongoose";
 import cors from "cors";
-import { connectDB } from "./config/db.js";
-import sareeRouter from "./routes/sareeRouter.js";
-import userRouter from "./routes/userRoute.js";
-import 'dotenv/config';
-import cartRouter from "./routes/cartRoute.js";
-import orderRouter from "./routes/orderRoute.js"
+import sareeRoute from "./routes/sareeRouter.js";
+import orderRoute from "./routes/orderRoute.js";
+import dotenv from "dotenv";
+import { upload } from "./uploads/Upload.js";
+
+dotenv.config();
+
 const app = express();
-const port = process.env.PORT || 4000;
-app.set("view engine","ejs")
+
+/* MIDDLEWARE */
+app.use(cors({ origin: "*" }));
 app.use(express.json());
-
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com",
-      "https://handloom-saree-e-commerce-webapp-2-admin2.onrender.com",
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-   
-    credentials: true,
-  })
-);
-
-
- 
-connectDB();
-
-// API endpoints
-app.use("/api/saree", sareeRouter);
-app.use("/api/cart",cartRouter);
 app.use("/images", express.static("uploads"));
-app.use("/api/user",userRouter);
-app.use("/api/orders",orderRouter);
 
-app.use("/api/order", orderRouter);
+/* ROUTES */
+app.use("/api/saree", sareeRoute);
+app.use("/api/order", orderRoute);
 
-app.get("/", (req, res) => {
-  res.send("API Working");
-});
+/* DB */
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch(console.error);
 
-app.listen(port, () => {
-  console.log(`Server is up: http://localhost:${port}`);
-});
-
+/* SERVER */
+app.listen(5000, () => console.log("Server running on port 5000"));

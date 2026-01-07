@@ -24,8 +24,10 @@ const Contact = () => {
         console.log(contact)
   
         try{
-         await axios.post('http://localhost:3000/Contact',contact)
-
+        await axios.post(
+  "https://handloom-saree-e-commerce-webapp-1-hcwc.onrender.com/api/contact",
+  contact
+);
          console.log("data Saved:",contact)
 
          window.confirm("Message Send Successfully");
