@@ -1,30 +1,34 @@
-
+// server.js
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
-import sareeRoute from "./routes/sareeRouter.js";
-import orderRoute from "./routes/orderRoute.js";
-import dotenv from "dotenv";
-import { upload } from "./uploads/Upload.js";
-
-dotenv.config();
-
+import { connectDB } from "./config/db.js";
+import sareeRouter from "./routes/sareeRouter.js";
+import userRouter from "./routes/userRoute.js";
+import 'dotenv/config';
+import cartRouter from "./routes/cartRoute.js";
+import orderRouter from "./routes/orderRoute.js"
 const app = express();
-
-/* MIDDLEWARE */
-app.use(cors({ origin: "*" }));
+const port = process.env.PORT || 4000;
+app.set("view engine","ejs")
 app.use(express.json());
+app.use(cors());
+
+connectDB();
+
+// API endpoints
+app.use("/api/saree", sareeRouter);
+app.use("/api/cart",cartRouter);
 app.use("/images", express.static("uploads"));
+app.use("/api/user",userRouter);
+app.use("/api/orders",orderRouter);
 
-/* ROUTES */
-app.use("/api/saree", sareeRoute);
-app.use("/api/order", orderRoute);
+app.use("/api/order", orderRouter);
 
-/* DB */
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch(console.error);
+app.get("/", (req, res) => {
+  res.send("API Working");
+});
 
-/* SERVER */
-app.listen(5000, () => console.log("Server running on port 5000"));
+app.listen(port, () => {
+  console.log(`Server is up: http://localhost:${port}`);
+});
+
