@@ -3,7 +3,7 @@ import React, { useContext, useState } from "react";
 import { Menu, X, ShoppingCart, Search } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { context } from "../Context/StoreContext";
-import { FaUserCircle, FaSignOutAlt, FaBoxOpen } from "react-icons/fa";
+import { FaUserCircle, FaSignOutAlt, FaBoxOpen, FaHeart } from "react-icons/fa";
 
 const Navbar = ({ setShowLogine }) => {
   const nav = useNavigate();
@@ -75,6 +75,11 @@ const Navbar = ({ setShowLogine }) => {
                 {totalItem}
               </span>
             )}
+          </button>
+
+          {/* WISHLIST */}
+          <button onClick={() => nav("/wishlist")} className="relative">
+            <FaHeart className="text-pink-600" />
           </button>
 
           {/* AUTH DESKTOP */}

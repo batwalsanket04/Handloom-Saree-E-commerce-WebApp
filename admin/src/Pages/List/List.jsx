@@ -12,7 +12,8 @@ const List = () => {
   const fetchList = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${url}/api/saree/list`);
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${url}/api/saree/list`, { headers: { Authorization: token ? `Bearer ${token}` : "" } });
       if (res.data.success) setList(res.data.data);
       else toast.error(res.data.message || "Error fetching list");
     } catch (err) {
@@ -26,7 +27,8 @@ const List = () => {
   // Delete a saree by ID
   const removeItem = async (_id) => {
     try {
-      const res = await axios.delete(`${url}/api/saree/remove/${_id}`);
+      const token = localStorage.getItem("token");
+      const res = await axios.delete(`${url}/api/saree/remove/${_id}`, { headers: { Authorization: token ? `Bearer ${token}` : "" } });
       if (res.data.success) {
         toast.success(res.data.message);
         fetchList(); // Refresh list after deletion

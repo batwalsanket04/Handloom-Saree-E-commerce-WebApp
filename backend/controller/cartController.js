@@ -13,6 +13,9 @@ const addToCart = async (req, res) => {
 
     // decode token to get user ID
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.instance || decoded.instance !== process.env.SERVER_INSTANCE_ID) {
+      return res.json({ success: false, message: "Token invalid after server restart, please login again" });
+    }
     const userId = decoded.id;
 
     let userData = await userModel.findById(userId);
@@ -47,6 +50,9 @@ const removeFromCart = async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.instance || decoded.instance !== process.env.SERVER_INSTANCE_ID) {
+      return res.json({ success: false, message: "Token invalid after server restart, please login again" });
+    }
     const userId = decoded.id;
 
     let userData = await userModel.findById(userId);
@@ -75,6 +81,9 @@ const getCart = async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.instance || decoded.instance !== process.env.SERVER_INSTANCE_ID) {
+      return res.json({ success: false, message: "Token invalid after server restart, please login again" });
+    }
     const userId = decoded.id;
 
     let userData = await userModel.findById(userId);

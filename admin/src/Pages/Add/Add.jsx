@@ -46,8 +46,9 @@ const Add = () => {
       payload.append("category", formData.category);
       if (formData.imageFile) payload.append("image", formData.imageFile);
 
+      const token = localStorage.getItem("token");
       const response = await axios.post(`${url}/api/saree/add`, payload, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { "Content-Type": "multipart/form-data", Authorization: token ? `Bearer ${token}` : "" },
       });
 
       if (response.data.success) {

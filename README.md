@@ -56,3 +56,28 @@ The aim was to build a practical online store from scratch with authentication, 
 
  
 
+
+## Environment variables
+Add a `.env` file in the `backend` folder with these values (use `.env.example` as a template):
+
+- `JWT_SECRET` — secret for signing JWT tokens
+- `MONGODB_URI` — your MongoDB connection string
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` — if using Cloudinary for image uploads
+- `PORT` — optional server port (defaults to 4000)
+
+Run the backend:
+```bash
+cd backend
+npm install
+npm run server
+```
+
+Run the frontend (example):
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+
+

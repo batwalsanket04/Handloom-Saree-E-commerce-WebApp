@@ -4,9 +4,14 @@ import cors from "cors";
 import { connectDB } from "./config/db.js";
 import sareeRouter from "./routes/sareeRouter.js";
 import userRouter from "./routes/userRoute.js";
+import wishlistRouter from "./routes/wishlistRoute.js";
 import 'dotenv/config';
+// Generate a per-process instance id to invalidate tokens on server restart
+process.env.SERVER_INSTANCE_ID = process.env.SERVER_INSTANCE_ID || String(Date.now());
 import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js"
+import contactRouter from "./routes/contactRoute.js";
+import healthRouter from "./routes/healthRoute.js";
 const app = express();
 const port = process.env.PORT || 4000;
 app.set("view engine","ejs")
@@ -20,7 +25,11 @@ app.use("/api/saree", sareeRouter);
 app.use("/api/cart",cartRouter);
 app.use("/images", express.static("uploads"));
 app.use("/api/user",userRouter);
+app.use("/api/wishlist", wishlistRouter);
 app.use("/api/orders",orderRouter);
+
+app.use("/api/contact", contactRouter);
+app.use("/api/health", healthRouter);
 
 app.use("/api/order", orderRouter);
 

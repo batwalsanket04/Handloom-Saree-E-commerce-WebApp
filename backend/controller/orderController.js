@@ -21,7 +21,7 @@ const placeOrder = async (req, res) => {
     await newOrder.save();
 
     // clear cart after placing order
-    await userModel.findByIdAndUpdate(req.body.userId, { cartdata: {} });
+    await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
 
     const line_items = req.body.items.map((val) => ({
       price_data: {
@@ -142,7 +142,7 @@ const placeCodOrder = async (req, res) => {
     await newOrder.save();
 
     // Clear user's cart after placing order
-    await userModel.findByIdAndUpdate(userId, { cartdata: {} });
+    await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
     //  Send success response
     res.status(200).json({

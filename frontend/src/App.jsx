@@ -17,6 +17,7 @@ import Contact from './componant/Contact/Contact'
 import { context } from './Context/StoreContext'
  import Verify from './pages/Verify/Verify'
 import MyOrders from './pages/MyOrders/MyOrders'
+import Wishlist from './pages/Wishlist/Wishlist'
  
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
         <Route path='/order' element={<PlaceOrder/>} />
         <Route path='/verify' element={<Verify/>}/>
         <Route path='/myorders' element={<MyOrders/>} />
+        <Route path='/wishlist' element={<Wishlist/>} />
 
         
       </Routes>

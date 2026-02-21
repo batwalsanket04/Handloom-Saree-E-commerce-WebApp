@@ -1,9 +1,9 @@
 import React, { useContext, useEffect } from "react";
 import { context } from "../../Context/StoreContext";
-import { FaPlus, FaMinus, FaStar, FaStarHalfAlt } from "react-icons/fa";
+import { FaPlus, FaMinus, FaStar, FaStarHalfAlt, FaHeart, FaRegHeart } from "react-icons/fa";
 
 const SareeItem = ({ _id, name, price, description, image }) => {
-  const { cartItem, addToCart, removeFromCart, url } = useContext(context);
+  const { cartItem, addToCart, removeFromCart, url, isInWishlist, addToWishlist, removeFromWishlist } = useContext(context);
 
  useEffect(() => {
   localStorage.setItem("CartItem", JSON.stringify(cartItem));
@@ -14,11 +14,11 @@ const SareeItem = ({ _id, name, price, description, image }) => {
     <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition overflow-hidden flex flex-col">
       <div className="relative w-full h-60">
      <img
-  src={
-    image
-      ? `${url}/images/${image}`
-      : "/placeholder.jpg"
-  }
+      src={
+        image
+          ? (image.startsWith("http") ? image : `${url}/images/${image}`)
+          : "/placeholder.jpg"
+      }
   alt={name}
   onError={(e) => {
     e.target.onerror = null;
@@ -53,6 +53,17 @@ const SareeItem = ({ _id, name, price, description, image }) => {
             </button>
           </div>
         )}
+        {/* Wishlist button top-left */}
+        <button
+          className="absolute top-2 left-2 bg-white rounded-full p-2 shadow-md"
+          onClick={() => (isInWishlist(_id) ? removeFromWishlist(_id) : addToWishlist(_id))}
+        >
+          {isInWishlist(_id) ? (
+            <FaHeart className="text-pink-600" />
+          ) : (
+            <FaRegHeart className="text-gray-400" />
+          )}
+        </button>
       </div>
 
       <div className="p-4 flex flex-col flex-1">

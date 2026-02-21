@@ -5,7 +5,7 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom";
 
 const PlaceOrder = () => {
-  const { getTotalCartAmount, token, sarees, cartItem, url } =
+  const { getTotalCartAmount, token, sarees, cartItem, url, user } =
     useContext(context);
 
   const [delivery, setDelivery] = useState({
@@ -48,7 +48,7 @@ const PlaceOrder = () => {
       }));
 
     let orderData = {
-      userId: localStorage.getItem("userId"),
+      userId: user?._id || localStorage.getItem("userId"),
       address: delivery,
       items: orderItems,
       amount: getTotalCartAmount() + 180,

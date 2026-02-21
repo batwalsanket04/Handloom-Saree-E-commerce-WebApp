@@ -8,7 +8,8 @@ const Orders = ({ url }) => {
   // Fetch all orders
   const fetchAllOrders = async () => {
     try {
-      const response = await axios.get(`${url}/api/orders/list`); 
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`${url}/api/orders/list`, { headers: { Authorization: token ? `Bearer ${token}` : "" } }); 
       if (response.data.success) {
         setOrders(response.data.data);
       } else {
@@ -23,9 +24,8 @@ const Orders = ({ url }) => {
   // Update order status
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      const response = await axios.post(`${url}/api/orders/update/${orderId}`, {
-        status: newStatus,
-      });
+      const token = localStorage.getItem("token");
+      const response = await axios.post(`${url}/api/orders/update/${orderId}`, { status: newStatus }, { headers: { Authorization: token ? `Bearer ${token}` : "" } });
 
       if (response.data.success) {
         toast.success("Order status updated!");

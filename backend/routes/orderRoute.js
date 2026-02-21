@@ -1,5 +1,5 @@
 import express from "express";
-import authMiddleware from "../middlewere/auth.js";
+import authMiddleware, { authorizeAdmin } from "../middlewere/auth.js";
 import { 
   placeOrder, 
   verifyOrder, 
@@ -14,8 +14,9 @@ const orderRouter = express.Router();
 orderRouter.post("/place", authMiddleware, placeOrder);
 orderRouter.post("/verify", verifyOrder);
 orderRouter.post("/userorders", authMiddleware, userOrder);
-orderRouter.get("/list", listOrders);
-orderRouter.post("/update/:orderId", updateOrderStatus);
+// list & update should be admin-protected
+orderRouter.get("/list", authMiddleware, authorizeAdmin, listOrders);
+orderRouter.post("/update/:orderId", authMiddleware, authorizeAdmin, updateOrderStatus);
 orderRouter.post("/cod", authMiddleware, placeCodOrder);
 
 

@@ -10,6 +10,7 @@ export const StoreContext = ({ children }) => {
   /* -------------------- STATES -------------------- */
   const [sarees, setSarees] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [wishlist, setWishlist] = useState([]);
 
   const [token, setToken] = useState(
     localStorage.getItem("token") || ""
@@ -82,6 +83,23 @@ export const StoreContext = ({ children }) => {
     fetchSarees();
   }, []);
 
+  // Load wishlist when token is available
+  useEffect(() => {
+    const loadWishlist = async () => {
+      const t = localStorage.getItem("token") || token;
+      if (!t) return;
+      try {
+        const res = await axios.get(`${url}/api/wishlist/`, {
+          headers: { Authorization: `Bearer ${t}` },
+        });
+        setWishlist(res.data?.wishlist || []);
+      } catch (err) {
+        console.error("Wishlist load error:", err);
+      }
+    };
+    loadWishlist();
+  }, [token]);
+
   /* -------------------- LOAD CART (FIXED) -------------------- */
  // ONLY SHOWING FIXED PARTS (LOGIC ONLY)
 
@@ -137,6 +155,37 @@ const removeFromCart = async (id) => {
       0
     );
 
+  /* -------------------- WISHLIST -------------------- */
+  const isInWishlist = (id) => wishlist.some((s) => (s && s._id ? s._id === id : s === id));
+
+  const addToWishlist = async (sareeId) => {
+    if (!token) return;
+    try {
+      const res = await axios.post(
+        `${url}/api/wishlist/add`,
+        { sareeId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setWishlist(res.data?.wishlist || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const removeFromWishlist = async (sareeId) => {
+    if (!token) return;
+    try {
+      const res = await axios.post(
+        `${url}/api/wishlist/remove`,
+        { sareeId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setWishlist(res.data?.wishlist || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   /* -------------------- LOGOUT -------------------- */
   const logout = () => {
     localStorage.removeItem("token");
@@ -152,6 +201,27 @@ const removeFromCart = async (id) => {
       item.name.toLowerCase().includes(searchText.toLowerCase()) ||
       item.category?.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  // Remote search (optional) — returns results from backend search API
+  const remoteSearch = async (q) => {
+    try {
+      const res = await axios.get(`${url}/api/saree/search`, { params: { q } });
+      return res.data?.data || [];
+    } catch (err) {
+      console.error("Remote search error:", err);
+      return [];
+    }
+  };
+
+  const getRelatedProducts = async (id) => {
+    try {
+      const res = await axios.get(`${url}/api/saree/related/${id}`);
+      return res.data?.data || [];
+    } catch (err) {
+      console.error("Related fetch error:", err);
+      return [];
+    }
+  };
 
   return (
     <context.Provider
@@ -170,7 +240,13 @@ const removeFromCart = async (id) => {
         setUser,
         logout,
         url,
-        loadCartData
+        loadCartData,
+        wishlist,
+        addToWishlist,
+        removeFromWishlist,
+        isInWishlist,
+        remoteSearch,
+        getRelatedProducts,
       }}
     >
       {children}

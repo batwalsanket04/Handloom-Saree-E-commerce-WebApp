@@ -1,10 +1,12 @@
  import React from 'react';
  import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
- import Navbar from './Componants/Navbar/Navbar';
- import Sidebar from './Componants/Sidebar/Sidebar';
- import Add from './Pages/Add/Add';
- import List from './Pages/List/List';
- import Orders from './Pages/Orders/Orders';
+import Navbar from './Componants/Navbar/Navbar';
+import Sidebar from './Componants/Sidebar/Sidebar';
+import Add from './Pages/Add/Add';
+import List from './Pages/List/List';
+import Orders from './Pages/Orders/Orders';
+import Login from './Pages/Login/Login';
+import RequireAdmin from './Componants/RequireAdmin/RequireAdmin';
  import { ToastContainer } from 'react-toastify';
  import "react-toastify/dist/ReactToastify.css";
  
@@ -22,9 +24,10 @@
      <Sidebar />
      <main className="flex-1 p-6">
        <Routes>
-         <Route path="/add" element={<Add url={url}/>} />
-         <Route path="/list" element={<List url={url}/>} />
-         <Route path="/order" element={<Orders url={url}/>} />
+         <Route path="/login" element={<Login url={url} />} />
+         <Route path="/add" element={<RequireAdmin url={url}><Add url={url}/></RequireAdmin>} />
+         <Route path="/list" element={<RequireAdmin url={url}><List url={url}/></RequireAdmin>} />
+         <Route path="/order" element={<RequireAdmin url={url}><Orders url={url}/></RequireAdmin>} />
        </Routes>
      </main>
    </div>

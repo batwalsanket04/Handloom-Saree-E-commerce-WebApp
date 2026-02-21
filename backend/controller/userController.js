@@ -21,7 +21,7 @@ const loginUser=async (req,res)=>{
            
         }
         const token=createToken(user._id);
-         res.json({success:true,token})
+         res.json({success:true,token,user:{_id:user._id,name:user.name,email:user.email,role:user.role}})
     }catch(error){
         console.log(error)
         res.json({success:false,message:'error'})
@@ -30,7 +30,8 @@ const loginUser=async (req,res)=>{
 
 }
 const createToken=(id)=>{
-    return jwt.sign({id},process.env.JWT_SECRET)
+    const payload = { id, instance: process.env.SERVER_INSTANCE_ID };
+    return jwt.sign(payload, process.env.JWT_SECRET);
 }
 // register user
 
@@ -62,7 +63,7 @@ try{
     })
    const user = await newUser.save()
    const token=createToken(user._id)
-   res.json({success:'true',token});
+    res.json({success:true,token,user:{_id:user._id,name:user.name,email:user.email,role:user.role}});
 
 } catch(error){
     console.log(error);
@@ -71,4 +72,66 @@ try{
 
 }
 
-export {loginUser,registerUser}
+// get profile (uses auth middleware)
+const getProfile = async (req, res) => {
+    try {
+        // auth middleware attaches req.user when possible
+        const user = req.user || (await userModel.findById(req.body.userId).select("-password"));
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+        res.json({ success: true, user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+// Wishlist endpoints
+const getWishlist = async (req, res) => {
+    try {
+        const user = req.user || (await userModel.findById(req.body.userId));
+        if (!user) return res.json({ success: false, message: "User not found" });
+        await user.populate("wishlist");
+        res.json({ success: true, wishlist: user.wishlist });
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: "Error fetching wishlist" });
+    }
+};
+
+const addToWishlist = async (req, res) => {
+    try {
+        const { sareeId } = req.body;
+        if (!sareeId) return res.json({ success: false, message: "sareeId required" });
+        const user = req.user || (await userModel.findById(req.body.userId));
+        if (!user) return res.json({ success: false, message: "User not found" });
+        if (!user.wishlist) user.wishlist = [];
+        const exists = user.wishlist.map((id) => id.toString()).includes(sareeId.toString());
+        if (!exists) {
+            user.wishlist.push(sareeId);
+            await user.save();
+        }
+        await user.populate("wishlist");
+        res.json({ success: true, wishlist: user.wishlist });
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: "Error adding to wishlist" });
+    }
+};
+
+const removeFromWishlist = async (req, res) => {
+    try {
+        const { sareeId } = req.body;
+        if (!sareeId) return res.json({ success: false, message: "sareeId required" });
+        const user = req.user || (await userModel.findById(req.body.userId));
+        if (!user) return res.json({ success: false, message: "User not found" });
+        user.wishlist = (user.wishlist || []).filter((id) => id.toString() !== sareeId.toString());
+        await user.save();
+        await user.populate("wishlist");
+        res.json({ success: true, wishlist: user.wishlist });
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: "Error removing from wishlist" });
+    }
+};
+
+export {loginUser,registerUser,getProfile,getWishlist,addToWishlist,removeFromWishlist}
