@@ -29,9 +29,36 @@ const loginUser=async (req,res)=>{
 
 
 }
+
+// admin login - only with env credentials
+const adminLogin = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        // Check if email and password match admin credentials from env
+        if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
+            return res.json({ success: false, message: "Invalid admin credentials" });
+        }
+        
+        // Create admin token
+        const token = createToken("admin");
+        res.json({ 
+            success: true, 
+            token, 
+            user: { 
+                _id: "admin",
+                name: "Admin", 
+                email: email, 
+                role: "admin" 
+            } 
+        });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: 'error' });
+    }
+};
+
 const createToken=(id)=>{
-    const payload = { id, instance: process.env.SERVER_INSTANCE_ID };
-    return jwt.sign(payload, process.env.JWT_SECRET);
+    return jwt.sign({ id }, process.env.JWT_SECRET);
 }
 // register user
 
@@ -75,6 +102,19 @@ try{
 // get profile (uses auth middleware)
 const getProfile = async (req, res) => {
     try {
+        // Handle admin user (special case - id will be "admin" string, not MongoDB ObjectId)
+        if (req.body.userId === "admin") {
+            return res.json({ 
+                success: true, 
+                user: { 
+                    _id: "admin",
+                    name: "Admin", 
+                    email: process.env.ADMIN_EMAIL, 
+                    role: "admin" 
+                } 
+            });
+        }
+        
         // auth middleware attaches req.user when possible
         const user = req.user || (await userModel.findById(req.body.userId).select("-password"));
         if (!user) return res.status(404).json({ success: false, message: "User not found" });
@@ -134,4 +174,4 @@ const removeFromWishlist = async (req, res) => {
     }
 };
 
-export {loginUser,registerUser,getProfile,getWishlist,addToWishlist,removeFromWishlist}
+export {loginUser,registerUser,getProfile,getWishlist,addToWishlist,removeFromWishlist,adminLogin}

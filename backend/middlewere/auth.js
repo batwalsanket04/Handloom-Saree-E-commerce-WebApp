@@ -17,19 +17,25 @@ const authMiddleware = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // require token instance to match current server instance id
-    if (!decoded.instance || decoded.instance !== process.env.SERVER_INSTANCE_ID) {
-      return res.status(401).json({ success: false, message: "Token invalid after server restart, please login again" });
-    }
     // attach userId for existing controllers
     req.body.userId = decoded.id;
 
-    // also attach full user object if available
-    try {
-      const user = await userModel.findById(decoded.id).select("-password");
-      if (user) req.user = user;
-    } catch (e) {
-      // ignore
+    // Handle admin user (special case)
+    if (decoded.id === "admin") {
+      req.user = {
+        _id: "admin",
+        name: "Admin",
+        email: process.env.ADMIN_EMAIL,
+        role: "admin"
+      };
+    } else {
+      // also attach full user object if available for regular users
+      try {
+        const user = await userModel.findById(decoded.id).select("-password");
+        if (user) req.user = user;
+      } catch (e) {
+        // ignore
+      }
     }
 
     next();

@@ -13,7 +13,7 @@ const Login = ({ url }) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post(`${url}/api/user/login`, { email, password });
+      const res = await axios.post(`${url}/api/user/admin-login`, { email, password });
       if (res.data.success && res.data.user) {
         if (res.data.user.role !== "admin") {
           toast.error("Admin access required");
@@ -22,6 +22,8 @@ const Login = ({ url }) => {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("user", JSON.stringify(res.data.user));
         toast.success("Logged in as admin");
+     
+  console.log("Stored token:", localStorage.getItem("token"));
         navigate("/list");
       } else {
         toast.error(res.data.message || "Login failed");

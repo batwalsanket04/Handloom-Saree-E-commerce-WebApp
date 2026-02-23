@@ -6,8 +6,6 @@ import sareeRouter from "./routes/sareeRouter.js";
 import userRouter from "./routes/userRoute.js";
 import wishlistRouter from "./routes/wishlistRoute.js";
 import 'dotenv/config';
-// Generate a per-process instance id to invalidate tokens on server restart
-process.env.SERVER_INSTANCE_ID = process.env.SERVER_INSTANCE_ID || String(Date.now());
 import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js"
 import contactRouter from "./routes/contactRoute.js";

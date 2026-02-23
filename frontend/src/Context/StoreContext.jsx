@@ -5,7 +5,7 @@ export const context = createContext(null);
 
 export const StoreContext = ({ children }) => {
   const url =
-    "https://handloom-saree-e-commerce-webapp-1-hcwc.onrender.com";
+    import.meta.env.VITE_API_URL || "http://localhost:4000";
 
   /* -------------------- STATES -------------------- */
   const [sarees, setSarees] = useState([]);
