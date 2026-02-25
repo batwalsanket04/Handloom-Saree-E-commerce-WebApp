@@ -194,4 +194,63 @@ const removeFromWishlist = async (req, res) => {
     }
 };
 
-export {loginUser,registerUser,getProfile,getWishlist,addToWishlist,removeFromWishlist,adminLogin}
+// Verify token endpoint - validates JWT token
+const verifyToken = async (req, res) => {
+    try {
+        // If we reach here, authMiddleware has already validated the token
+        // req.userId and req.userRole are set by authMiddleware
+        
+        if (req.userId === "admin" && req.userRole === "admin") {
+            // Admin token is valid
+            return res.json({
+                success: true,
+                valid: true,
+                user: {
+                    _id: "admin",
+                    name: "Admin",
+                    email: process.env.ADMIN_EMAIL,
+                    role: "admin"
+                }
+            });
+        }
+
+        // Check if user still exists in database
+        const user = await userModel.findById(req.userId).select("-password");
+        if (!user) {
+            return res.json({
+                success: true,
+                valid: false,
+                message: "User no longer exists"
+            });
+        }
+
+        // Check if user has admin role
+        if (user.role !== "admin") {
+            return res.json({
+                success: true,
+                valid: false,
+                message: "Admin access required"
+            });
+        }
+
+        res.json({
+            success: true,
+            valid: true,
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+        });
+    } catch (error) {
+        console.error("Verify token error:", error);
+        res.status(401).json({
+            success: false,
+            valid: false,
+            message: "Invalid or expired token"
+        });
+    }
+};
+
+export {loginUser,registerUser,getProfile,getWishlist,addToWishlist,removeFromWishlist,adminLogin,verifyToken}
