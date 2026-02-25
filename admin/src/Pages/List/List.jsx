@@ -3,21 +3,34 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { FaTrash } from "react-icons/fa";
 
-const List = () => {
-  const url = "https://handloom-saree-e-commerce-webapp-1-hcwc.onrender.com"; // Backend URL
+const List = ({ url = "http://localhost:4000" }) => {
   const [list, setList] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Fetch all sarees from backend
   const fetchList = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${url}/api/saree/list`, { headers: { Authorization: token ? `Bearer ${token}` : "" } });
-      if (res.data.success) setList(res.data.data);
-      else toast.error(res.data.message || "Error fetching list");
+      console.log("Fetching list with token:", token ? "Token exists" : "No token");
+      
+      const res = await axios.get(`${url}/api/saree/list`, { 
+        headers: { 
+          Authorization: token ? `Bearer ${token}` : "",
+          "Content-Type": "application/json"
+        } 
+      });
+      
+      console.log("List response:", res.data);
+      
+      if (res.data.success) {
+        setList(res.data.data || []);
+      } else {
+        toast.error(res.data.message || "Error fetching list");
+      }
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching list:", err);
+      console.error("Error response:", err.response);
       toast.error("Server error");
     } finally {
       setLoading(false);
@@ -28,7 +41,9 @@ const List = () => {
   const removeItem = async (_id) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.delete(`${url}/api/saree/remove/${_id}`, { headers: { Authorization: token ? `Bearer ${token}` : "" } });
+      const res = await axios.delete(`${url}/api/saree/remove/${_id}`, { 
+        headers: { Authorization: token ? `Bearer ${token}` : "" } 
+      });
       if (res.data.success) {
         toast.success(res.data.message);
         fetchList(); // Refresh list after deletion
@@ -47,10 +62,13 @@ const List = () => {
 
   return (
     <div className="mt-24 px-4 sm:px-6 md:px-10">
-      <h2 className="text-2xl font-semibold text-gray-700 mb-6">All Sarees</h2>
+      <h2 className="text-2xl font-semibold text-gray-700 mb-6">All Sarees ({list.length})</h2>
 
       {loading ? (
-        <p className="text-gray-500">Loading...</p>
+        <div className="text-center py-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto"></div>
+          <p className="mt-4 text-gray-500">Loading...</p>
+        </div>
       ) : list.length === 0 ? (
         <p className="text-gray-500">No items found.</p>
       ) : (
@@ -72,9 +90,12 @@ const List = () => {
                 className="grid grid-cols-5 gap-4 items-center p-4 border-b border-gray-100 hover:bg-pink-50 transition"
               >
                 <img
-                  src={`${url}/images/${item.image}`}
+                  src={item.image}
                   alt={item.name}
                   className="w-20 h-20 object-cover rounded-lg border border-gray-200"
+                  onError={(e) => {
+                    e.target.src = "https://via.placeholder.com/80?text=No+Image";
+                  }}
                 />
                 <p className="text-gray-700 font-medium">{item.name}</p>
                 <p className="text-gray-500">{item.category}</p>

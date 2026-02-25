@@ -20,7 +20,7 @@ const loginUser=async (req,res)=>{
             return res.json({success:false,message:"Invalid credentials"})
            
         }
-        const token=createToken(user._id);
+        const token = createToken(user._id, user.role || "user");
          res.json({success:true,token,user:{_id:user._id,name:user.name,email:user.email,role:user.role}})
     }catch(error){
         console.log(error)
@@ -32,34 +32,47 @@ const loginUser=async (req,res)=>{
 
 // admin login - only with env credentials
 const adminLogin = async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        // Check if email and password match admin credentials from env
-        if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
-            return res.json({ success: false, message: "Invalid admin credentials" });
-        }
-        
-        // Create admin token
-        const token = createToken("admin");
-        res.json({ 
-            success: true, 
-            token, 
-            user: { 
-                _id: "admin",
-                name: "Admin", 
-                email: email, 
-                role: "admin" 
-            } 
-        });
-    } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: 'error' });
+  const { email, password } = req.body;
+
+  try {
+    if (
+      email !== process.env.ADMIN_EMAIL ||
+      password !== process.env.ADMIN_PASSWORD
+    ) {
+      return res.json({
+        success: false,
+        message: "Invalid admin credentials",
+      });
     }
+
+    const token = createToken("admin", "admin");
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        _id: "admin",
+        name: "Admin",
+        email: email,
+        role: "admin",
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
 };
 
-const createToken=(id)=>{
-    return jwt.sign({ id }, process.env.JWT_SECRET);
-}
+const createToken = (id, role = "user") => {
+  return jwt.sign(
+    { id, role },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+};
 // register user
 
 const registerUser=async(req,res)=>{
@@ -101,28 +114,35 @@ try{
 
 // get profile (uses auth middleware)
 const getProfile = async (req, res) => {
-    try {
-        // Handle admin user (special case - id will be "admin" string, not MongoDB ObjectId)
-        if (req.body.userId === "admin") {
-            return res.json({ 
-                success: true, 
-                user: { 
-                    _id: "admin",
-                    name: "Admin", 
-                    email: process.env.ADMIN_EMAIL, 
-                    role: "admin" 
-                } 
-            });
-        }
-        
-        // auth middleware attaches req.user when possible
-        const user = req.user || (await userModel.findById(req.body.userId).select("-password"));
-        if (!user) return res.status(404).json({ success: false, message: "User not found" });
-        res.json({ success: true, user });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Server error" });
+  try {
+    // If admin
+    if (req.userId === "admin") {
+      return res.json({
+        success: true,
+        user: {
+          _id: "admin",
+          name: "Admin",
+          email: process.env.ADMIN_EMAIL,
+          role: "admin",
+        },
+      });
     }
+
+    const user = await userModel.findById(req.userId).select("-password");
+
+    if (!user)
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+
+    res.json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
 };
 
 // Wishlist endpoints

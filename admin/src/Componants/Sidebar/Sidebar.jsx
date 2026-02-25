@@ -22,7 +22,7 @@ const Sidebar = () => {
       </NavLink>
 
       <NavLink
-        to="/order"
+        to="/orders"
         className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-300 hover:border-pink-500 hover:bg-pink-50 cursor-pointer transition"
       >
         <ShoppingCart className="w-6 h-6 text-pink-600" />

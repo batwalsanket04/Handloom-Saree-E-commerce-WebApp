@@ -3,8 +3,7 @@ import { Plus } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const Add = () => {
-  const url = "http://localhost:4000";
+const Add = ({ url = "http://localhost:4000" }) => {
 
   const [formData, setFormData] = useState({
     Pname: "",
@@ -48,7 +47,10 @@ const Add = () => {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(`${url}/api/saree/add`, payload, {
-        headers: { "Content-Type": "multipart/form-data", Authorization: token ? `Bearer ${token}` : "" },
+        headers: { 
+          "Content-Type": "multipart/form-data", 
+          "Authorization": `Bearer ${token}`
+        },
       });
 
       if (response.data.success) {
@@ -82,14 +84,13 @@ const Add = () => {
           Add New Item
         </h2>
 
-        <div className="flex flex-col items-center">
-          <p className="text-gray-600 text-sm mb-1">Upload Image</p>
-          <label className="flex flex-col items-center justify-center w-32 h-32 border-2 border-dashed border-pink-300 rounded-lg cursor-pointer hover:border-pink-500 hover:bg-pink-50 transition overflow-hidden">
+        <div>
+          <label className="block w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-pink-400 transition flex items-center justify-center overflow-hidden bg-gray-50">
             {formData.imagePreview ? (
               <img
                 src={formData.imagePreview}
                 alt="Preview"
-                className="w-full h-full object-cover rounded-lg"
+                className="w-full h-full object-contain"
               />
             ) : (
               <div className="flex flex-col items-center justify-center text-pink-400">

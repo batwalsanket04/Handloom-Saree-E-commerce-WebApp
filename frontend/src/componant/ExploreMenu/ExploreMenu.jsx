@@ -17,7 +17,7 @@ const ExploreMenu = ({ category, setCategory }) => {
   {/* 🔹 ALL BUTTON */}
   <div
     onClick={() => setCategory("All")}
-    className={`flex-shrink-0 w-[180px] h-[230px] bg-white shadow rounded-2xl overflow-hidden cursor-pointer snap-center transition-transform duration-300 hover:scale-105 ${
+    className={`flex-shrink-0 w-[180px] h-[230px]   bg-white shadow rounded-2xl overflow-hidden cursor-pointer snap-center transition-transform duration-300 hover:scale-105 ${
       category === "All" ? "border-2 border-pink-600 shadow-lg" : ""
     }`}
   >
@@ -38,7 +38,7 @@ const ExploreMenu = ({ category, setCategory }) => {
           prev === val.category ? "All" : val.category
         )
       }
-      className={`flex-shrink-0 w-[180px] h-[230px] bg-white shadow rounded-2xl overflow-hidden cursor-pointer snap-center transition-transform duration-300 hover:scale-105 ${
+      className={`flex-shrink-0 w-[180px] h-[230px]   bg-white shadow rounded-2xl overflow-hidden cursor-pointer snap-center transition-transform duration-300 hover:scale-105 ${
         category === val.category ? "border-2 border-pink-600 shadow-lg" : ""
       }`}
     >

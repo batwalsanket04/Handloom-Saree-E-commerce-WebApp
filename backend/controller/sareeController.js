@@ -53,7 +53,7 @@ export const listSaree = async (req, res) => {
   try {
     console.log("listSaree: querying database for sarees...");
     const sarees = await sareeModel.find({});
-    console.log(`listSaree: found ${sarees.length} sarees`);
+    //console.log(`listSaree: found ${sarees.length} sarees`);
     res.json({ success: true, data: sarees });
   } catch (error) {
     console.error("listSaree error:", error);

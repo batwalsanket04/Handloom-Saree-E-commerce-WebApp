@@ -4,20 +4,56 @@ import { toast } from "react-toastify";
 
 const Orders = ({ url }) => {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Fetch all orders
   const fetchAllOrders = async () => {
     try {
+      setLoading(true);
+      setError(null);
+      
       const token = localStorage.getItem("token");
-      const response = await axios.get(`${url}/api/orders/list`, { headers: { Authorization: token ? `Bearer ${token}` : "" } }); 
+      console.log("Fetching orders with token:", token ? "Token exists" : "No token");
+      
+      if (!token) {
+        setError("No authentication token found. Please login.");
+        setLoading(false);
+        return;
+      }
+
+      // Fixed: Use /api/orders/list (plural) to match backend route
+      const response = await axios.get(`${url}/api/orders/list`, { 
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      }); 
+      
+      console.log("Orders response:", response.data);
+      
       if (response.data.success) {
-        setOrders(response.data.data);
+        setOrders(response.data.data || []);
       } else {
-        toast.error("Failed to fetch orders!");
+        setError(response.data.message || "Failed to fetch orders");
+        toast.error(response.data.message || "Failed to fetch orders!");
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
-      toast.error("Server error while fetching orders!");
+      console.error("Error response:", error.response);
+      
+      if (error.response?.status === 401) {
+        setError("Authentication failed. Please login again.");
+        toast.error("Please login again");
+      } else if (error.response?.status === 403) {
+        setError("Admin access required.");
+        toast.error("Admin access required");
+      } else {
+        setError(error.response?.data?.message || "Server error while fetching orders");
+        toast.error(error.response?.data?.message || "Server error while fetching orders!");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -25,7 +61,12 @@ const Orders = ({ url }) => {
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post(`${url}/api/orders/update/${orderId}`, { status: newStatus }, { headers: { Authorization: token ? `Bearer ${token}` : "" } });
+      
+      // Fixed: Use /api/orders/update (plural) to match backend route
+      const response = await axios.post(`${url}/api/orders/update/${orderId}`, 
+        { status: newStatus }, 
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
 
       if (response.data.success) {
         toast.success("Order status updated!");
@@ -35,7 +76,7 @@ const Orders = ({ url }) => {
       }
     } catch (error) {
       console.error("Error updating order status:", error);
-      toast.error("Server error while updating status!");
+      toast.error(error.response?.data?.message || "Server error while updating status!");
     }
   };
 
@@ -43,11 +84,44 @@ const Orders = ({ url }) => {
     fetchAllOrders();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="mt-[120px] px-6 min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading orders...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mt-[120px] px-6 min-h-screen bg-gray-50">
+        <div className="max-w-6xl mx-auto bg-white p-6 rounded-2xl shadow-lg">
+          <h2 className="text-3xl font-semibold text-pink-700 mb-6 border-b pb-3">
+            All Orders
+          </h2>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+            <p className="font-semibold">Error:</p>
+            <p>{error}</p>
+            <button 
+              onClick={fetchAllOrders}
+              className="mt-4 px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-[120px] px-6 min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto bg-white p-6 rounded-2xl shadow-lg">
         <h2 className="text-3xl font-semibold text-pink-700 mb-6 border-b pb-3">
-          All Orders
+          All Orders ({orders.length})
         </h2>
 
         {orders.length === 0 ? (
@@ -86,7 +160,7 @@ const Orders = ({ url }) => {
                     Status:
                   </span>
                   <select
-                    value={order.status}
+                    value={order.status || "Order Processing"}
                     onChange={(e) =>
                       handleStatusChange(order._id, e.target.value)
                     }

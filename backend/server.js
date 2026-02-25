@@ -14,7 +14,10 @@ const app = express();
 const port = process.env.PORT || 4000;
 app.set("view engine","ejs")
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:5173", "http://localhost:4173", "http://127.0.0.1:5173"],
+  credentials: true
+}));
 
 connectDB();
 
@@ -29,8 +32,6 @@ app.use("/api/orders",orderRouter);
 app.use("/api/contact", contactRouter);
 app.use("/api/health", healthRouter);
 
-app.use("/api/order", orderRouter);
-
 app.get("/", (req, res) => {
   res.send("API Working");
 });
@@ -38,4 +39,3 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`Server is up: http://localhost:${port}`);
 });
-
