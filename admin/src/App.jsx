@@ -8,7 +8,7 @@ import Orders from './Pages/Orders/Orders';
 import Login from './Pages/Login/Login';
 import RequireAdmin from './Componants/RequireAdmin/RequireAdmin';
 
-const url = "http://localhost:4000";
+const url = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 const AppContent = () => {
   const location = useLocation();
