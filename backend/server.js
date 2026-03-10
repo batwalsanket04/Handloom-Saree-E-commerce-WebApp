@@ -15,7 +15,16 @@ const port = process.env.PORT || 4000;
 app.set("view engine","ejs")
 app.use(express.json());
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:4173", "http://127.0.0.1:5173", "http://127.0.0.1:5174"],
+  origin: [
+    "http://localhost:5173", 
+    "http://localhost:5174", 
+    "http://localhost:4173", 
+    "http://127.0.0.1:5173", 
+    "http://127.0.0.1:5174",
+    "https://handloom-saree-e-commerce-webapp-frontend-113c.onrender.com",
+    "https://handloom-saree-e-commerce-webapp-2-admin2.onrender.com",
+    "https://handloom-saree-e-commerce-webapp-1-hcwc.onrender.com"
+  ],
   credentials: true
 }));
 
