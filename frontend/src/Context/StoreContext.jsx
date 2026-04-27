@@ -27,12 +27,27 @@ export const StoreContext = ({ children }) => {
     } 
   });
 
-  const [cartItem, setCartItem] = useState({});
+  const [cartItem, setCartItem] = useState(() => {
+    try {
+      const stored = localStorage.getItem("cartItem");
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
   
   useEffect(() => {
-  localStorage.setItem("cartItem", JSON.stringify(cartItem));
-}, [cartItem]);
+    localStorage.setItem("cartItem", JSON.stringify(cartItem));
+  }, [cartItem]);
 
+  /* -------------------- SETUP AXIOS DEFAULTS -------------------- */
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    } else {
+      delete axios.defaults.headers.common["Authorization"];
+    }
+  }, [token]);
 
   /* -------------------- RESTORE LOGIN ON REFRESH -------------------- */
   useEffect(() => {
@@ -48,27 +63,33 @@ export const StoreContext = ({ children }) => {
         setUser(null);
       }
     }
-  }, []);useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (!token) return;
+  }, []);
 
-  const verifyUser = async () => {
-    try {
-      const res = await axios.get(`${url}/api/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+  /* -------------------- VERIFY USER ON MOUNT -------------------- */
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-      setUser(res.data.user);
-      setToken(token);
-    } catch (error) {
-    
-      logout();
-    }
-  };
+    const verifyUser = async () => {
+      try {
+        const res = await axios.get(`${url}/api/user/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-  verifyUser();
-}, []);
+        if (res.data.success) {
+          setUser(res.data.user);
+          setToken(token);
+        } else {
+          logout();
+        }
+      } catch (error) {
+        console.error("User verification failed:", error);
+        logout();
+      }
+    };
 
+    verifyUser();
+  }, []);
 
   /* -------------------- FETCH SAREES -------------------- */
   useEffect(() => {
@@ -83,7 +104,29 @@ export const StoreContext = ({ children }) => {
     fetchSarees();
   }, []);
 
-  // Load wishlist when token is available
+  /* -------------------- LOAD CART DATA -------------------- */
+  useEffect(() => {
+    if (!token) return;
+
+    const loadCartData = async () => {
+      try {
+        const res = await axios.post(
+          `${url}/api/cart/get`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (res.data.success) {
+          setCartItem(res.data.cartData || {});
+        }
+      } catch (err) {
+        console.error("Cart load error:", err);
+      }
+    };
+
+    loadCartData();
+  }, [token, url]);
+
+  /* -------------------- LOAD WISHLIST -------------------- */
   useEffect(() => {
     const loadWishlist = async () => {
       const t = localStorage.getItem("token") || token;
@@ -98,64 +141,69 @@ export const StoreContext = ({ children }) => {
       }
     };
     loadWishlist();
-  }, [token]);
+  }, [token, url]);
 
-  /* -------------------- LOAD CART (FIXED) -------------------- */
- // ONLY SHOWING FIXED PARTS (LOGIC ONLY)
+  /* -------------------- CART OPERATIONS -------------------- */
+  const addToCart = async (id) => {
+    if (!token) return;
 
-const loadCartData = async () => {
-  if (!token) return;
+    // Optimistic update
+    setCartItem(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
 
-  try {
-    const res = await axios.post(
-      `${url}/api/cart/get`,
-      {},
-      { headers: { token } }
-    );
-    setCartItem(res.data?.cartData || {});
-  } catch (err) {
-    console.error(err);
-  }
-};
+    try {
+      await axios.post(
+        `${url}/api/cart/add`,
+        { id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      // Revert optimistic update on error
+      setCartItem(prev => {
+        const updated = { ...prev };
+        updated[id] = Math.max(0, (updated[id] || 1) - 1);
+        if (updated[id] === 0) delete updated[id];
+        return updated;
+      });
+    }
+  };
 
-const addToCart = async (id) => {
-  if (!token) return;
+  const removeFromCart = async (id) => {
+    if (!token) return;
 
-  setCartItem(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+    // Optimistic update
+    setCartItem((prev) => {
+      const updated = { ...prev };
+      if (updated[id] > 1) {
+        updated[id] -= 1;
+      } else {
+        delete updated[id];
+      }
+      return updated;
+    });
 
-  await axios.post(
-    `${url}/api/cart/add`,
-    { id },
-    { headers: { token } }
-  );
-};
-
-const removeFromCart = async (id) => {
-  if (!token) return;
-
- setCartItem((prev) => {
-    const updatedCart = { ...prev };
-    delete updatedCart[id];
-    return updatedCart;
-  });
-
-  await axios.post(
-    `${url}/api/cart/remove`,
-    { id },
-    { headers: { token } }
-  );
-};
-
+    try {
+      await axios.post(
+        `${url}/api/cart/remove`,
+        { id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (error) {
+      console.error("Remove from cart error:", error);
+      // Revert optimistic update on error
+      setCartItem(prev => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+    }
+  };
 
   /* -------------------- TOTAL AMOUNT -------------------- */
   const getTotalCartAmount = () =>
     sarees.reduce(
       (total, item) =>
-        total + (cartItem[item._id] || 0) * item.price,
+        total + (cartItem[item._id] || 0) * (Number(item.price) || 0),
       0
     );
 
-  /* -------------------- WISHLIST -------------------- */
+  /* -------------------- WISHLIST OPERATIONS -------------------- */
   const isInWishlist = (id) => wishlist.some((s) => (s && s._id ? s._id === id : s === id));
 
   const addToWishlist = async (sareeId) => {
@@ -166,9 +214,11 @@ const removeFromCart = async (id) => {
         { sareeId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setWishlist(res.data?.wishlist || []);
+      if (res.data.success) {
+        setWishlist(res.data?.wishlist || []);
+      }
     } catch (err) {
-      console.error(err);
+      console.error("Add to wishlist error:", err);
     }
   };
 
@@ -180,9 +230,11 @@ const removeFromCart = async (id) => {
         { sareeId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setWishlist(res.data?.wishlist || []);
+      if (res.data.success) {
+        setWishlist(res.data?.wishlist || []);
+      }
     } catch (err) {
-      console.error(err);
+      console.error("Remove from wishlist error:", err);
     }
   };
 
@@ -190,19 +242,22 @@ const removeFromCart = async (id) => {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("cartItem");
     setToken("");
     setUser(null);
     setCartItem({});
+    setWishlist([]);
+    delete axios.defaults.headers.common["Authorization"];
   };
 
-  /* -------------------- SEARCH FILTER -------------------- */
+  /* -------------------- SEARCH & FILTER -------------------- */
   const filteredSarees = sarees.filter(
     (item) =>
       item.name.toLowerCase().includes(searchText.toLowerCase()) ||
       item.category?.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  // Remote search (optional) — returns results from backend search API
+  // Remote search API
   const remoteSearch = async (q) => {
     try {
       const res = await axios.get(`${url}/api/saree/search`, { params: { q } });
@@ -240,7 +295,6 @@ const removeFromCart = async (id) => {
         setUser,
         logout,
         url,
-        loadCartData,
         wishlist,
         addToWishlist,
         removeFromWishlist,

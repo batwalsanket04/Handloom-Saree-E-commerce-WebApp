@@ -1,89 +1,96 @@
-import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
+import sareeModel from "../models/sareeModel.js";
 
-//  Add item to cart
+// Add item to cart
 const addToCart = async (req, res) => {
   try {
-    const { token } = req.headers; // token from frontend
-    const { id } = req.body; // product ID from frontend
+    const { id } = req.body;
+    const userId = req.userId;
 
-    if (!token) {
-      return res.json({ success: false, message: "No token provided" });
+    if (!id) {
+      return res.status(400).json({ success: false, message: "Product ID required" });
     }
 
-    // decode token to get user ID
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
-
-    let userData = await userModel.findById(userId);
-    if (!userData) {
-      return res.json({ success: false, message: "User not found" });
+    // Validate product exists
+    const product = await sareeModel.findById(id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
     }
 
-    let cartData = userData.cartData || {};
-
-    if (!cartData[id]) {
-      cartData[id] = 1;
-    } else {
-      cartData[id] += 1;
+    // Check stock availability
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    await userModel.findByIdAndUpdate(userId, { cartData });
-    res.json({ success: true, message: "Added to cart" });
+    const currentQty = user.cartData?.[id] || 0;
+    if (product.stock <= currentQty) {
+      return res.status(400).json({
+        success: false,
+        message: `Only ${product.stock} items available in stock`,
+      });
+    }
+
+    let cartData = user.cartData || {};
+    cartData[id] = (cartData[id] || 0) + 1;
+
+    await userModel.findByIdAndUpdate(userId, { cartData }, { new: true });
+    res.json({ success: true, message: "Added to cart", cartData });
   } catch (error) {
-    console.error(error);
-    res.json({ success: false, message: "Error adding to cart" });
+    console.error("Error adding to cart:", error);
+    res.status(500).json({ success: false, message: "Error adding to cart" });
   }
 };
 
-// ✅ Remove item from cart
+// Remove item from cart
 const removeFromCart = async (req, res) => {
   try {
-    const { token } = req.headers;
     const { id } = req.body;
+    const userId = req.userId;
 
-    if (!token) {
-      return res.json({ success: false, message: "No token provided" });
+    if (!id) {
+      return res.status(400).json({ success: false, message: "Product ID required" });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
-
-    let userData = await userModel.findById(userId);
-    let cartData = userData.cartData || {};
-
-    if (cartData[id] > 0) {
-      cartData[id] -= 1;
-      if (cartData[id] === 0) delete cartData[id];
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    await userModel.findByIdAndUpdate(userId, { cartData });
-    res.json({ success: true, message: "Removed from cart" });
+    let cartData = user.cartData || {};
+
+    if (cartData[id]) {
+      if (cartData[id] > 1) {
+        cartData[id] -= 1;
+      } else {
+        delete cartData[id];
+      }
+    }
+
+    await userModel.findByIdAndUpdate(userId, { cartData }, { new: true });
+    res.json({ success: true, message: "Removed from cart", cartData });
   } catch (error) {
-    console.error(error);
-    res.json({ success: false, message: "Error removing from cart" });
+    console.error("Error removing from cart:", error);
+    res.status(500).json({ success: false, message: "Error removing from cart" });
   }
 };
 
-// ✅ Get user cart
+// Get user cart
 const getCart = async (req, res) => {
   try {
-    const { token } = req.headers;
+    const userId = req.userId;
 
-    if (!token) {
-      return res.json({ success: false, message: "No token provided" });
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
-
-    let userData = await userModel.findById(userId);
-    res.json({ success: true, cartData: userData.cartData });
+    res.json({ success: true, cartData: user.cartData || {} });
   } catch (error) {
-    console.error(error);
-    res.json({ success: false, message: "Error fetching cart" });
+    console.error("Error fetching cart:", error);
+    res.status(500).json({ success: false, message: "Error fetching cart" });
   }
 };
 
-
 export { addToCart, removeFromCart, getCart };
+

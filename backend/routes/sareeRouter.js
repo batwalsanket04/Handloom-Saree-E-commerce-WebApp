@@ -1,25 +1,28 @@
 // routes/sareeRouter.js
 import express from "express";
-import { addSaree, listSaree, removeSaree } from "../controller/sareeController.js";
+import { 
+  addSaree, 
+  listSaree, 
+  removeSaree,
+  searchSarees, 
+  relatedSarees,
+  updateSaree,
+  getSareeDetails,
+} from "../controller/sareeController.js";
 import upload from "../uploads/Upload.js";
-import { searchSarees, relatedSarees } from "../controller/sareeController.js";
-import authMiddleware, { authorizeAdmin } from "../middlewere/auth.js";
+import authMiddleware, { authorizeAdmin, authorizeSeller } from "../middlewere/auth.js";
 
 const router = express.Router();
 
-// Add saree with image upload (admin only)
-router.post("/add", authMiddleware, authorizeAdmin, upload.single("image"), addSaree);
-
-// List sarees
+// Public routes
 router.get("/list", listSaree);
-
-// Search sarees
 router.get("/search", searchSarees);
-
-// Related products
 router.get("/related/:id", relatedSarees);
+router.get("/:id", getSareeDetails);
 
-// Remove saree (admin only)
-router.delete("/remove/:id", authMiddleware, authorizeAdmin, removeSaree);
+// Admin/Seller routes - Protected
+router.post("/add", authMiddleware, authorizeSeller, upload.single("image"), addSaree);
+router.put("/:id", authMiddleware, authorizeSeller, upload.single("image"), updateSaree);
+router.delete("/remove/:id", authMiddleware, authorizeSeller, removeSaree);
 
 export default router;

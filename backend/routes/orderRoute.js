@@ -5,19 +5,26 @@ import {
   verifyOrder, 
   userOrder, 
   listOrders, 
-  updateOrderStatus ,
+  updateOrderStatus,
   placeCodOrder,
+  deleteOrder,
 } from "../controller/orderController.js";
 
 const orderRouter = express.Router();
 
+// Place orders
 orderRouter.post("/place", authMiddleware, placeOrder);
-orderRouter.post("/verify", verifyOrder);
-orderRouter.post("/userorders", authMiddleware, userOrder);
-// list & update should be admin-protected
-orderRouter.get("/list", authMiddleware, authorizeAdmin, listOrders);
-orderRouter.post("/update/:orderId", authMiddleware, authorizeAdmin, updateOrderStatus);
 orderRouter.post("/cod", authMiddleware, placeCodOrder);
 
+// Verify payment
+orderRouter.post("/verify", authMiddleware, verifyOrder);
+
+// Get user's orders
+orderRouter.get("/userorders", authMiddleware, userOrder);
+
+// Admin routes - List and manage orders
+orderRouter.get("/list", authMiddleware, authorizeAdmin, listOrders);
+orderRouter.post("/update/:orderId", authMiddleware, authorizeAdmin, updateOrderStatus);
+orderRouter.delete("/:orderId", authMiddleware, authorizeAdmin, deleteOrder);
 
 export default orderRouter;
