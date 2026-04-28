@@ -11,14 +11,16 @@ const Collection = () => {
 
   /* ---------------- CATEGORY LIST ---------------- */
   const categories = useMemo(() => {
-    const cats = filteredSarees.map(s => s.category || "All");
+    const cats = (filteredSarees || []).map(s => s.category || "All");
     return ["All", ...new Set(cats)];
   }, [filteredSarees]);
 
   /* ---------------- FINAL FILTER (SEARCH + CATEGORY) ---------------- */
   const finalSarees = useMemo(() => {
-    if (filter === "All") return filteredSarees;
-    return filteredSarees.filter(
+    const sarees = filteredSarees || [];
+    console.log(sarees)
+    if (filter === "All") return sarees;
+    return sarees.filter(
       s => (s.category || "").toLowerCase() === filter.toLowerCase()
     );
   }, [filter, filteredSarees]);
@@ -26,6 +28,7 @@ const Collection = () => {
   const capitalizeFirst = str =>
     str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
+  console.log(finalSarees)
   const settings = {
     dots: false,
     infinite: true,
@@ -85,10 +88,13 @@ const Collection = () => {
           <div key={s._id} className="p-2 w-full">
             <div className="relative group bg-white rounded-xl shadow overflow-hidden">
               <img
-                src={s.image ? `${url}/images/${s.image}` : "/placeholder.jpg"}
-                alt={s.name}
-                className="w-full h-64 object-cover group-hover:scale-105 transition"
-              />
+  src={s.image ? s.image : "/placeholder.jpg"}
+  alt={s.name}
+  onError={(e) => {
+    e.target.src = "/placeholder.jpg";
+  }}
+  className="w-full h-64 object-cover group-hover:scale-105 transition"
+/>
 
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition"></div>

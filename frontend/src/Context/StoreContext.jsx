@@ -77,7 +77,7 @@ const StoreContext = ({ children }) => {
   useEffect(() => {
     const fetchSarees = async () => {
       try {
-        const res = await axios.get(`${url}/api/saree/list`);
+            const res = await axios.get(`${url}/api/saree/list`);
         setSarees(res.data?.data || []);
       } catch (err) {
         console.error("Saree fetch error:", err);
@@ -220,7 +220,7 @@ const StoreContext = ({ children }) => {
   }, [sarees, cartItem]);
 
   /* -------------------- FILTER -------------------- */
-  const filteredSarees = sarees.filter(
+const filteredSarees = sarees.filter(
     (item) =>
       item.name?.toLowerCase().includes(searchText.toLowerCase()) ||
       item.category?.toLowerCase().includes(searchText.toLowerCase())
@@ -230,6 +230,7 @@ const StoreContext = ({ children }) => {
   const value = {
     url,
     sarees: filteredSarees,
+    filteredSarees,
     searchText,
     setSearchText,
     token,
