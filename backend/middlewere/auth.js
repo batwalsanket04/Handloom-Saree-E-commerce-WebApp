@@ -51,57 +51,56 @@ const authMiddleware = async (req, res, next) => {
 };
 
 /**
- * Admin Authorization Middleware
- * Ensures user has admin role
+ * Authorize Admin - Only allows admin role
  */
-export const authorizeAdmin = (req, res, next) => {
+const authorizeAdmin = (req, res, next) => {
   if (req.userRole !== "admin") {
     return res.status(403).json({
       success: false,
-      message: "Admin access required",
+      message: "Access denied - Admin role required",
     });
   }
   next();
 };
 
 /**
- * Seller Authorization Middleware
- * Ensures user has seller or admin role
+ * Authorize Seller - Allows admin or seller role
  */
-export const authorizeSeller = (req, res, next) => {
-  if (req.userRole !== "seller" && req.userRole !== "admin") {
+const authorizeSeller = (req, res, next) => {
+  if (req.userRole !== "admin" && req.userRole !== "seller") {
     return res.status(403).json({
       success: false,
-      message: "Seller or Admin access required",
+      message: "Access denied - Seller or Admin role required",
     });
   }
   next();
 };
 
 /**
- * User Authorization Middleware
- * Ensures user is authenticated and is the resource owner or admin
+ * Authorize User - Allows user to access their own resources, or admin all
  */
-export const authorizeUser = (req, res, next) => {
+const authorizeUser = (req, res, next) => {
   const resourceUserId = req.params.userId || req.body.userId;
 
   if (req.userRole === "admin") {
-    next();
-  } else if (req.userId && resourceUserId && req.userId.toString() === resourceUserId.toString()) {
-    next();
-  } else {
-    return res.status(403).json({
-      success: false,
-      message: "Unauthorized to access this resource",
-    });
+    return next();
   }
+
+  if (req.userId && resourceUserId && req.userId.toString() === resourceUserId.toString()) {
+    return next();
+  }
+
+  return res.status(403).json({
+    success: false,
+    message: "Access denied - You can only access your own resources",
+  });
 };
 
 /**
  * Optional Auth Middleware
  * Attempts to extract user info if token is provided, but doesn't fail if it's not
  */
-export const optionalAuth = (req, res, next) => {
+const optionalAuth = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -118,4 +117,5 @@ export const optionalAuth = (req, res, next) => {
   }
 };
 
+export { authMiddleware, authorizeAdmin, authorizeSeller, authorizeUser, optionalAuth };
 export default authMiddleware;

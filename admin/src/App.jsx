@@ -6,6 +6,8 @@ import Add from './Pages/Add/Add';
 import List from './Pages/List/List';
 import Orders from './Pages/Orders/Orders';
 import Login from './Pages/Login/Login';
+import UserManagement from './Pages/UserManagement/UserManagement';
+import Dashboard from './Pages/Dashboard/Dashboard';
 import RequireAdmin from './Componants/RequireAdmin/RequireAdmin';
 
 const url = import.meta.env.VITE_API_URL || "http://localhost:4000";
@@ -26,6 +28,9 @@ const AppContent = () => {
               <Route path="/add" element={<RequireAdmin><Add url={url}/></RequireAdmin>} />
               <Route path="/list" element={<RequireAdmin><List url={url}/></RequireAdmin>} />
               <Route path="/orders" element={<RequireAdmin><Orders url={url}/></RequireAdmin>} />
+              <Route path="/users" element={<RequireAdmin><UserManagement url={url}/></RequireAdmin>} />
+              <Route path="/dashboard" element={<RequireAdmin><Dashboard url={url}/></RequireAdmin>} />
+              <Route path="/" element={<RequireAdmin><Dashboard url={url}/></RequireAdmin>} />
             </Routes>
           </main>
         </div>

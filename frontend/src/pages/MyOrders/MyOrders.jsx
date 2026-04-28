@@ -6,33 +6,24 @@ const MyOrders = () => {
   const { url, token } = useContext(context);
   const [data, setData] = useState([]);
 
- const fetchOrders = async () => {
-  const res = await axios.post(
-    `${url}/api/order/userorders`,
-    {},
-    { headers: { token } }
-  );
-  setData(res.data.data || []);
-};
+  const fetchOrders = async () => {
+    try {
+      const res = await axios.get(`${url}/api/orders/userorders`);
+      setData(res.data.data || []);
+    } catch (err) {
+      console.error("Fetch orders error:", err);
+    }
+  };
 
+  useEffect(() => {
+    if (!token) return;
+    fetchOrders();
+    const interval = setInterval(fetchOrders, 5000);
+    return () => clearInterval(interval);
+  }, [token]);
 
+  const steps = ["Pending", "Order Processing", "Out for Delivery", "Delivered"];
 
- useEffect(() => {
-  if (!token) return;
-
-  fetchOrders(); // initial load
-
-  const interval = setInterval(() => {
-    fetchOrders(); // auto refresh every 5s
-  }, 2000);
-
-  return () => clearInterval(interval); // cleanup
-}, [token]);
-
-  //  Possible order status steps
-  const steps = ["Pending", "Shipped", "Out for Delivery", "Delivered"];
-
-  // Helper function to get index of current step
   const getStepIndex = (status) => steps.indexOf(status);
 
   return (
@@ -43,9 +34,7 @@ const MyOrders = () => {
         </h2>
 
         {data.length === 0 ? (
-          <p className="text-gray-500 text-center py-10">
-            You have no orders yet.
-          </p>
+          <p className="text-gray-500 text-center py-10">You have no orders yet.</p>
         ) : (
           <div className="space-y-5">
             {data.map((order) => (
@@ -55,8 +44,7 @@ const MyOrders = () => {
               >
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-medium text-gray-800">
-                    Order ID:{" "}
-                    <span className="text-pink-600">{order._id}</span>
+                    Order ID: <span className="text-pink-600">{order._id}</span>
                   </h3>
                   <span
                     className={`px-3 py-1 text-sm rounded-full ${
@@ -77,14 +65,12 @@ const MyOrders = () => {
                   {new Date(order.date).toLocaleDateString()}
                 </p>
 
-                {/* 🧭 Order tracking bar */}
                 <div className="flex justify-between relative mt-3 mb-1">
                   {steps.map((step, index) => (
                     <div
                       key={step}
                       className="flex-1 flex flex-col items-center text-center"
                     >
-                      {/* circle */}
                       <div
                         className={`w-6 h-6 rounded-full border-2 ${
                           index <= getStepIndex(order.status)
@@ -104,16 +90,11 @@ const MyOrders = () => {
                     </div>
                   ))}
 
-                  {/* progress line */}
                   <div className="absolute top-3 left-3 right-3 h-0.5 bg-gray-200 z-0">
                     <div
                       className="h-0.5 bg-pink-500 transition-all duration-500"
                       style={{
-                        width: `${
-                          (getStepIndex(order.status) /
-                            (steps.length - 1)) *
-                          100
-                        }%`,
+                        width: `${(getStepIndex(order.status) / (steps.length - 1)) * 100}%`,
                       }}
                     ></div>
                   </div>

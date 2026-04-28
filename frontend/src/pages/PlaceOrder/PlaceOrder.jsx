@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { context } from "../../Context/StoreContext";
-import axios from "axios"
-  import {toast} from "react-toastify"
+import axios from "axios";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const PlaceOrder = () => {
@@ -20,7 +20,7 @@ const PlaceOrder = () => {
     phone: "",
   });
 
-    const [paymentMethod, setPaymentMethod] = useState("stripe");
+  const [paymentMethod, setPaymentMethod] = useState("stripe");
   const navigate = useNavigate();
 
   // Redirect to /cart if user not logged in OR cart empty
@@ -35,63 +35,59 @@ const PlaceOrder = () => {
     setDelivery((prev) => ({ ...prev, [name]: value }));
   };
 
- const submitDelivery = async (e) => {
-  e.preventDefault();
+  const submitDelivery = async (e) => {
+    e.preventDefault();
 
-  try {
-    // Build order items
-    let orderItems = sarees
-      .filter((val) => cartItem[val._id] > 0)
-      .map((val) => ({
-        ...val,
-        quantity: cartItem[val._id],
-      }));
+    try {
+      // Build order items
+      let orderItems = sarees
+        .filter((val) => cartItem[val._id] > 0)
+        .map((val) => ({
+          ...val,
+          quantity: cartItem[val._id],
+        }));
 
-    let orderData = {
-      userId: user?._id || localStorage.getItem("userId"),
-      address: delivery,
-      items: orderItems,
-      amount: getTotalCartAmount() + 180,
-      paymentMethod,
-    };
+      let orderData = {
+        userId: user?._id || localStorage.getItem("userId"),
+        address: delivery,
+        items: orderItems,
+        amount: getTotalCartAmount() + 180,
+        paymentMethod,
+      };
 
-    if (paymentMethod === "stripe") {
-      //  STRIPE PAYMENT
-      const response = await axios.post(
-  `${url}/api/order/place`,
-  orderData,
-  { headers: { token } }
-);
+      if (paymentMethod === "stripe") {
+        // STRIPE PAYMENT
+        const response = await axios.post(
+          `${url}/api/orders/place`,
+          orderData
+        );
 
+        if (response.data.success) {
+          window.location.replace(response.data.session_url);
+        } else {
+          toast.error("Error placing Stripe order");
+        }
+      } else if (paymentMethod === "cod") {
+        // CASH ON DELIVERY
+        const response = await axios.post(
+          `${url}/api/orders/cod`,
+          orderData
+        );
 
-      if (response.data.success) {
-        window.location.replace(response.data.session_url);
+        if (response.data.success) {
+          toast.success("COD order placed successfully!");
+          navigate("/myorders");
+        } else {
+          toast.error("Error placing COD order");
+        }
       } else {
-        toast.error("Error placing Stripe order")
+        toast.warning("Please select a payment method.");
       }
-    } else if (paymentMethod === "cod") {
-      //  CASH ON DELIVERY
-      const response = await axios.post(
-  `${url}/api/order/cod`,
-  orderData,
-  { headers: { token } }
-);
-
-
-      if (response.data.success) {
-        toast.success("COD order placed successfully!");
-        navigate("/myorders");
-      } else {
-        toast.error("Error placing COD order");
-      }
-    } else {
-      toast.warning("Please select a payment method.");
+    } catch (error) {
+      console.error("Error during order placement:", error);
+      toast.error("Something went wrong. Please try again.");
     }
-  } catch (error) {
-    console.error("Error during order placement:", error);
-    toast.error("Something went wrong. Please try again.");
-  }
-};
+  };
 
   return (
     <form
@@ -224,34 +220,34 @@ const PlaceOrder = () => {
                 : getTotalCartAmount() + 180}
             </p>
           </div>
- <div className="bg-white p-4 rounded-xl shadow-md mb-4">
-  <h2 className="text-lg font-semibold text-gray-800 mb-3">
-    Payment Method
-  </h2>
-  <div className="flex flex-col gap-3">
-    <label className="flex items-center gap-2 cursor-pointer">
-      <input
-        type="radio"
-        name="payment"
-        value="stripe"
-        checked={paymentMethod === "stripe"}
-        onChange={() => setPaymentMethod("stripe")}
-      />
-      <span>Pay with Card (Stripe)</span>
-    </label>
-    <label className="flex items-center gap-2 cursor-pointer">
-      <input
-        type="radio"
-        name="payment"
-        value="cod"
-        checked={paymentMethod === "cod"}
-        onChange={() => setPaymentMethod("cod")}
-      />
-      <span>Cash on Delivery</span>
-    </label>
-  </div>
-</div>
 
+          <div className="bg-white p-4 rounded-xl shadow-md mb-4">
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">
+              Payment Method
+            </h2>
+            <div className="flex flex-col gap-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="stripe"
+                  checked={paymentMethod === "stripe"}
+                  onChange={() => setPaymentMethod("stripe")}
+                />
+                <span>Pay with Card (Stripe)</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="cod"
+                  checked={paymentMethod === "cod"}
+                  onChange={() => setPaymentMethod("cod")}
+                />
+                <span>Cash on Delivery</span>
+              </label>
+            </div>
+          </div>
 
           <button
             type="submit"

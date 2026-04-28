@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
-import { BrowserRouter as Router,Routes,Route} from 'react-router-dom'
- 
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+
 import Navbar from './componant/Navbar'
 import Home from './pages/Home/Home'
 import Cart from './pages/Cart/Cart'
@@ -12,21 +11,19 @@ import LoginPopUp from './componant/LoginPopUp/LoginPopUp'
 import About from './componant/About/About'
 import Collection from './componant/Collection/Collection'
 import Contact from './componant/Contact/Contact'
- 
-import { context } from './Context/StoreContext'
-import { ProtectedRoute } from './componant/ProtectedRoute'
 import Verify from './pages/Verify/Verify'
 import MyOrders from './pages/MyOrders/MyOrders'
 import Wishlist from './pages/Wishlist/Wishlist'
- 
+import ProtectedRoute from './componant/ProtectedRoute'
+
+import { context } from './Context/StoreContext'
 
 function App() {
-  const [showLogin,setShowLogine]=useState(false);
-  const {token}=useContext(context);
+  const [showLogin, setShowLogine] = useState(false);
+  const { token } = useContext(context);
 
-  // Show login popup after 5 seconds if not authenticated
   useEffect(() => {
-    if(!token){
+    if (!token) {
       const timer = setTimeout(() => {
         setShowLogine(true);
       }, 5000);
@@ -36,27 +33,39 @@ function App() {
 
   return (
     <>
-      {showLogin && !token && <LoginPopUp setShowLogine={setShowLogine}/>}
+      {showLogin && !token && <LoginPopUp setShowLogine={setShowLogine} />}
 
       <Router>
-        <Navbar setShowLogine={setShowLogine}/>
+        <Navbar setShowLogine={setShowLogine} />
         <Routes>
-          {/* Public Routes */}
-          <Route path='/' element={<Home/>} />
-          <Route path='/collection' element={<Collection/>} />
-          <Route path='/about' element={<About/>} />
-          <Route path='/contact' element={<Contact/>}/>
-
-          {/* Protected Routes - Requires Authentication */}
-          <Route path='/cart' element={<ProtectedRoute><Cart/></ProtectedRoute>} />
-          <Route path='/order' element={<ProtectedRoute><PlaceOrder/></ProtectedRoute>} />
-          <Route path='/verify' element={<ProtectedRoute><Verify/></ProtectedRoute>}/>
-          <Route path='/myorders' element={<ProtectedRoute><MyOrders/></ProtectedRoute>} />
-          <Route path='/wishlist' element={<ProtectedRoute><Wishlist/></ProtectedRoute>} />
+          <Route path='/' element={<Home />} />
+          <Route path='/collection' element={<Collection />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/contact' element={<Contact />} />
+          <Route path='/cart' element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          } />
+          <Route path='/order' element={
+            <ProtectedRoute>
+              <PlaceOrder />
+            </ProtectedRoute>
+          } />
+          <Route path='/verify' element={<Verify />} />
+          <Route path='/myorders' element={
+            <ProtectedRoute>
+              <MyOrders />
+            </ProtectedRoute>
+          } />
+          <Route path='/wishlist' element={
+            <ProtectedRoute>
+              <Wishlist />
+            </ProtectedRoute>
+          } />
         </Routes>
-        
-        <ScrollTop/>
-        <Footer/>
+        <ScrollTop />
+        <Footer />
       </Router>
     </>
   )

@@ -236,7 +236,7 @@ const placeCodOrder = async (req, res) => {
   }
 };
 
-/* ───────── Delete Order (Admin) ───────── */
+ 
 export const deleteOrder = async (req, res) => {
   try {
     const { orderId } = req.params;

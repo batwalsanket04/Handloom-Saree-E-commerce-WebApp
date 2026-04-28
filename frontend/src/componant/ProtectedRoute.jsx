@@ -1,35 +1,32 @@
-import React, { useContext } from 'react';
-import { Navigate } from 'react-router-dom';
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useContext } from 'react';
 import { context } from '../Context/StoreContext';
 
-/**
- * ProtectedRoute Component
- * Ensures only authenticated users can access certain routes
- * Redirects to home if user is not logged in
- */
-export const ProtectedRoute = ({ children }) => {
-  const { token } = useContext(context);
+const ProtectedRoute = ({ children, requireAuth = true, allowedRoles = [] }) => {
+  const { token, user, loading } = useContext(context);
+  const location = useLocation();
 
-  if (!token) {
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  // If authentication is required but user is not logged in
+  if (requireAuth && !token) {
+    return <Navigate to="/" state={{ from: location }} replace />;
+  }
+
+  // If user is logged in but trying to access login page
+  if (token && location.pathname === '/login') {
     return <Navigate to="/" replace />;
   }
 
-  return children;
-};
-
-/**
- * AdminRoute Component
- * Ensures only admin users can access admin routes
- * Redirects to home if user is not an admin
- */
-export const AdminRoute = ({ children }) => {
-  const { token, user } = useContext(context);
-
-  if (!token || !user) {
-    return <Navigate to="/" replace />;
-  }
-
-  if (user.role !== "admin") {
+  // If specific roles are required
+  if (allowedRoles.length > 0 && user && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
   }
 

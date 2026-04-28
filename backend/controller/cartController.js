@@ -1,28 +1,28 @@
+import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
 import sareeModel from "../models/sareeModel.js";
 
 // Add item to cart
 const addToCart = async (req, res) => {
   try {
-    const { id } = req.body;
     const userId = req.userId;
+    const { id } = req.body;
 
     if (!id) {
       return res.status(400).json({ success: false, message: "Product ID required" });
     }
 
-    // Validate product exists
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
     const product = await sareeModel.findById(id);
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
     // Check stock availability
-    const user = await userModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-
     const currentQty = user.cartData?.[id] || 0;
     if (product.stock <= currentQty) {
       return res.status(400).json({
@@ -45,8 +45,8 @@ const addToCart = async (req, res) => {
 // Remove item from cart
 const removeFromCart = async (req, res) => {
   try {
-    const { id } = req.body;
     const userId = req.userId;
+    const { id } = req.body;
 
     if (!id) {
       return res.status(400).json({ success: false, message: "Product ID required" });
@@ -59,12 +59,11 @@ const removeFromCart = async (req, res) => {
 
     let cartData = user.cartData || {};
 
-    if (cartData[id]) {
-      if (cartData[id] > 1) {
-        cartData[id] -= 1;
-      } else {
-        delete cartData[id];
-      }
+    if (cartData[id] && cartData[id] > 0) {
+      cartData[id] -= 1;
+      if (cartData[id] === 0) delete cartData[id];
+    } else {
+      return res.status(400).json({ success: false, message: "Item not in cart" });
     }
 
     await userModel.findByIdAndUpdate(userId, { cartData }, { new: true });

@@ -1,20 +1,17 @@
-# TODO: Steps 7-10 Implementation
+# Order System Bug Fixes - TODO
 
-## Step 7: Improve Saree Controller - Validation & Error Handling
-- [ ] Fix sareeController.js: ObjectId validation, regex escaping, required image check, pagination
-- [ ] Fix sareeRouter.js: Change route guards from authorizeAdmin to authorizeSeller for add/delete
+## Root Causes Identified
+1. **API URL Mismatch**: Frontend uses `/api/order/*` (singular) but backend mounts at `/api/orders/*` (plural) → 404
+2. **Auth Header Mismatch**: Frontend sends `{ headers: { token } }` but backend expects `Authorization: Bearer <token>` → 401
+3. **Wrong HTTP Method**: `MyOrders.jsx` uses POST for `/api/orders/userorders` but route is GET → 405
+4. **Missing Auth on Verify**: `Verify.jsx` calls `/verify` without token but route requires authMiddleware → 401
+5. **Missing Context Export**: `Cart.jsx` destructures `loadCartData` but `StoreContext.jsx` never exports it → Runtime crash
+6. **Schema Type Mismatch**: `orderModel.js` uses `userId: String` but `listOrders` tries `.populate("userId")` which needs ObjectId
 
-## Step 8: Data Flow Correction
-- [ ] Fix server.js: Remove EJS, add global error handler, request size limits
-- [ ] Fix orderRoute.js: Remove duplicate POST /userorders
-- [ ] Fix orderController.js: Add stock deduction on order placement
-- [ ] Fix cartController.js: Validate product exists before adding to cart
-
-## Step 9: Security Improvements
-- [ ] Fix auth.js: ObjectId comparison bug in authorizeUser
-- [ ] Ensure consistent HTTP status codes across all controllers
-
-## Step 10: Performance & Clean Code
-- [ ] Fix StoreContext.jsx: Add url dependency, clean data flow
-- [ ] Add MongoDB indexes to sareeModel.js, userModel.js, orderModel.js
-
+## Files to Edit
+- [ ] `backend/models/orderModel.js` — Fix userId type to ObjectId
+- [ ] `frontend/src/pages/PlaceOrder/PlaceOrder.jsx` — Fix URLs and headers
+- [ ] `frontend/src/pages/Verify/Verify.jsx` — Fix URL, add auth header, add try-catch
+- [ ] `frontend/src/pages/MyOrders/MyOrders.jsx` — Fix URL, method, headers
+- [ ] `frontend/src/Context/StoreContext.jsx` — Export loadCartData
+- [ ] `frontend/src/pages/Cart/Cart.jsx` — Remove/loadCartData dependency

@@ -6,7 +6,7 @@ import { FaXmark } from "react-icons/fa6";
 import { toast } from "react-toastify";
 
 const LoginPopUp = ({ setShowLogine }) => {
- const { setToken, setUser, url } = useContext(context);
+ const { login, url } = useContext(context);
   const [currState, setCurrState] = useState("Sign Up");
   const [data, setData] = useState({ name: "", email: "", password: "" });
 
@@ -23,23 +23,16 @@ const LoginPopUp = ({ setShowLogine }) => {
       const endpoint = currState === "Sign Up" ? `${url}/api/user/register` : `${url}/api/user/login`;
       const res = await axios.post(endpoint, data);
 
-   if (res.data.success) {
-  setToken(res.data.token);
-  localStorage.setItem("token", res.data.token);
-
-  if (res.data.user) {
-    setUser(res.data.user);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
-  }
-
-  setShowLogine(false);
-} else {
-  toast.error(res.data.message);
-}
-
+      if (res.data.success) {
+        login(res.data.user, res.data.token);
+        setShowLogine(false);
+        toast.success(currState === "Sign Up" ? "Account created successfully!" : "Logged in successfully!");
+      } else {
+        toast.error(res.data.message);
+      }
     } catch (err) {
       console.error(err);
-     toast.error("Server Error");
+      toast.error("Server Error");
     }
   };
 

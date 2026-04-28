@@ -18,9 +18,13 @@ export const addSaree = async (req, res) => {
   try {
     const { name, description, price, category, stock } = req.body;
 
+    console.log("Request body:", req.body);
+    console.log("Request file:", req.file ? `${req.file.originalname} (${req.file.size} bytes)` : "No file");
+    console.log("User ID:", req.userId, "User Role:", req.userRole);
+
     // Validation
-    if (!name || !description || !price || !category) {
-      return handleError(res, 400, "Name, description, price, and category are required", false);
+    if (!name || !price || !category) {
+      return handleError(res, 400, "Name, price, and category are required", false);
     }
 
     if (!req.file) {
@@ -42,31 +46,45 @@ export const addSaree = async (req, res) => {
     let image_public_id = null;
 
     try {
+      console.log("Starting Cloudinary upload for file:", req.file.originalname);
+      
+      // Upload to Cloudinary
       const uploadRes = await cloudinary.uploader.upload(req.file.path, {
         folder: "paithani_sarees",
         resource_type: "auto",
       });
+      
+      console.log("Cloudinary upload success:", uploadRes.secure_url);
       image_field = uploadRes.secure_url;
       image_public_id = uploadRes.public_id;
 
+      // Clean up temporary file
       fs.unlink(req.file.path, (err) => {
         if (err) console.warn("Failed to remove local file:", err);
       });
     } catch (err) {
-      console.error("Cloudinary upload error:", err);
-      return handleError(res, 500, "Image upload failed");
+      console.error("Cloudinary upload error:", err.message);
+      
+      // Fallback: Use local file path if Cloudinary fails
+      console.log("Cloudinary failed, using local file path as fallback");
+      image_field = `http://localhost:4000/images/${req.file.filename}`;
+      image_public_id = null;
     }
 
-    const saree = new sareeModel({
+    const sareeData = {
       name: name.trim(),
-      description: description.trim(),
+      description: description ? description.trim() : "No description provided",
       price: numPrice,
       category: category.trim(),
       image: image_field,
       imagePublicId: image_public_id,
       stock: numStock,
-      sellerId: req.userRole === "admin" ? req.body.sellerId || req.userId : req.userId,
-    });
+sellerId: mongoose.Types.ObjectId.isValid(req.userId) ? req.userId : null,
+    };
+
+    console.log("Creating saree with data:", sareeData);
+
+    const saree = new sareeModel(sareeData);
 
     await saree.save();
 
@@ -76,7 +94,13 @@ export const addSaree = async (req, res) => {
       data: saree,
     });
   } catch (error) {
-    return handleError(res, 500, "Server error while adding saree");
+    console.error("Error adding saree:", {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      details: error.errors || error,
+    });
+    return handleError(res, 500, `Server error while adding saree: ${error.message}`);
   }
 };
 
