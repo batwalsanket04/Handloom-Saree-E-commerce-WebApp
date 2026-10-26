@@ -12,6 +12,7 @@ import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import contactRouter from "./routes/contactRoute.js";
 import healthRouter from "./routes/healthRoute.js";
+import apiLimiter from "./middlewere/rate.limiter.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -46,6 +47,10 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(apiLimiter);
+console.log(apiLimiter)
+
 
 console.log({
  DB_USERNAME: process.env.DB_USERNAME,

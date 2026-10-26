@@ -20,12 +20,14 @@ import {
   registerSchema,
   updateUserRoleSchema,
 } from "../Validator/user.validator.js";
+
+ import apiLimiter from "../middlewere/rate.limiter.js";
 const userRouter = express.Router();
 
 // Public routes
-userRouter.post("/register", validate(registerSchema), registerUser);
-userRouter.post("/login", validate(loginSchema), loginUser);
-userRouter.post("/admin-login", validate(adminLoginSchema), adminLogin);
+userRouter.post("/register", apiLimiter,validate(registerSchema), registerUser);
+userRouter.post("/login",apiLimiter, validate(loginSchema), loginUser);
+userRouter.post("/admin-login",apiLimiter ,validate(adminLoginSchema), adminLogin);
 
 // Protected routes
 userRouter.get("/profile", authMiddleware, getProfile);

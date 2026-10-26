@@ -8,6 +8,7 @@ import api from "../../api/axios";
 const LoginPopUp = ({ setShowLogine }) => {
  const { login } = useContext(context);
   const [currState, setCurrState] = useState("Sign Up");
+  const [loading,setLoading]=useState(false);
   const [errors,setErrors]=useState({});
   const [data, setData] = useState({ name: "", email: "", password: "" });
 
@@ -34,6 +35,7 @@ setErrors({
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true)
     const endpoint =
 currState === "Sign Up"
 ? "/user/register"
@@ -69,14 +71,53 @@ else{
 
 }
     } catch (err) {
-      const validationErrors = err.response?.data?.errors;
 
-      if (validationErrors && typeof validationErrors === "object") {
-        setErrors(validationErrors);
-      } else if (currState === "Sign In" && err.response?.status === 401) {
-        setErrors({ password: "Invalid email or password" });
-      }
-    }
+const status = err.response?.status;
+
+const validationErrors = err.response?.data?.errors;
+
+
+if(status === 429){
+
+setErrors({
+  email: err.response.data.message
+});
+
+return;
+
+}
+
+
+if(validationErrors && typeof validationErrors === "object"){
+
+setErrors(validationErrors);
+
+}
+
+
+else if(currState === "Sign In" && status === 401){
+
+setErrors({
+password:"Invalid email or password"
+});
+
+}
+
+else{
+
+toast.error(
+err.response?.data?.message || "Something went wrong"
+);
+
+}
+
+}finally{
+  setTimeout(()=>{
+
+    setLoading(false)
+
+  },1000)
+}
   };
 
   return (
@@ -171,12 +212,25 @@ errors.password && (
 }
       </div>
 
-      <button
-        type="submit"
-        className="w-full bg-gradient-to-r from-pink-600 to-purple-600 text-white py-2 rounded-full font-semibold text-lg hover:scale-105 transition-transform"
-      >
-        {currState === "Sign Up" ? "Create Account" : "Login"}
-      </button>
+     <button
+type="submit"
+disabled={loading}
+className="w-full bg-gradient-to-r from-pink-600 to-purple-600 text-white py-2 rounded-full"
+>
+
+{
+loading 
+?
+"Please wait..."
+:
+currState === "Sign Up"
+?
+"Create Account"
+:
+"Login"
+}
+
+</button>
     </form>
 
     <p className="mt-6 text-center text-gray-500 text-sm">
