@@ -1,18 +1,42 @@
 import userModel from "../models/userModel.js";
+import sareeModel from "../models/sareeModel.js";
+import RefreshToken from "../models/refreshtoken.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import validator from "validator";
 
-/* ───────── helpers ───────── */
+const isValidId = (id) => Number.isSafeInteger(Number(id)) && Number(id) > 0;
+
 const createToken = (id, role = "user") => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
+};
+
+const createRefreshToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
+};
+
+const saveRefreshToken = async (user, res) => {
+  const token = createRefreshToken(user.id);
+  const maxAge = 7 * 24 * 60 * 60 * 1000;
+
+  await RefreshToken.create({
+    userId: user.id,
+    token,
+    expiresAt: new Date(Date.now() + maxAge),
+  });
+
+  res.cookie("refreshToken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge,
+  });
 };
 
 const handleError = (res, status, message) => {
   return res.status(status).json({ success: false, message });
 };
 
-/* ───────── Login User ───────── */
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -21,7 +45,10 @@ const loginUser = async (req, res) => {
       return handleError(res, 400, "Email and password are required");
     }
 
-    const user = await userModel.findOne({ email: email.toLowerCase() });
+    const user = await userModel.findOne({
+      where: { email: String(email).trim().toLowerCase() },
+    });
+
     if (!user) {
       return handleError(res, 401, "User doesn't exist");
     }
@@ -31,11 +58,13 @@ const loginUser = async (req, res) => {
       return handleError(res, 401, "Invalid credentials");
     }
 
-    const token = createToken(user._id, user.role);
-    res.json({
+    const token = createToken(user.id, user.role);
+    await saveRefreshToken(user, res);
+    return res.json({
       success: true,
       token,
-      user: { _id: user._id, name: user.name, email: user.email, role: user.role },
+      accessToken: token,
+      user: { id: user.id, _id: user.id, name: user.name, email: user.email, role: user.role },
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -43,7 +72,6 @@ const loginUser = async (req, res) => {
   }
 };
 
-/* ───────── Admin Login ───────── */
 const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -57,10 +85,11 @@ const adminLogin = async (req, res) => {
     }
 
     const token = createToken("admin", "admin");
-    res.json({
+    return res.json({
       success: true,
       token,
-      user: { _id: "admin", name: "Admin", email, role: "admin" },
+      accessToken: token,
+      user: { id: "admin", _id: "admin", name: "Admin", email, role: "admin" },
     });
   } catch (error) {
     console.error("Admin login error:", error);
@@ -68,7 +97,6 @@ const adminLogin = async (req, res) => {
   }
 };
 
-/* ───────── Register User ───────── */
 const registerUser = async (req, res) => {
   try {
     const { name, password, email } = req.body;
@@ -77,12 +105,14 @@ const registerUser = async (req, res) => {
       return handleError(res, 400, "Name, email, and password are required");
     }
 
-    const exists = await userModel.findOne({ email: email.toLowerCase() });
-    if (exists) {
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const existingUser = await userModel.findOne({ where: { email: normalizedEmail } });
+
+    if (existingUser) {
       return handleError(res, 409, "User already exists");
     }
 
-    if (!validator.isEmail(email)) {
+    if (!validator.isEmail(normalizedEmail)) {
       return handleError(res, 400, "Please enter a valid email");
     }
 
@@ -90,23 +120,21 @@ const registerUser = async (req, res) => {
       return handleError(res, 400, "Password must be at least 8 characters");
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = new userModel({
-      name: name.trim(),
-      email: email.toLowerCase(),
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await userModel.create({
+      name: String(name).trim(),
+      email: normalizedEmail,
       password: hashedPassword,
-      role: "user", // Security: never allow role selection on register
+      role: "user",
     });
 
-    const user = await newUser.save();
-    const token = createToken(user._id, user.role);
-
-    res.status(201).json({
+    const token = createToken(user.id, user.role);
+    await saveRefreshToken(user, res);
+    return res.status(201).json({
       success: true,
       token,
-      user: { _id: user._id, name: user.name, email: user.email, role: user.role },
+      accessToken: token,
+      user: { id: user.id, _id: user.id, name: user.name, email: user.email, role: user.role },
     });
   } catch (error) {
     console.error("Registration error:", error);
@@ -114,48 +142,52 @@ const registerUser = async (req, res) => {
   }
 };
 
-/* ───────── Get Profile ───────── */
 const getProfile = async (req, res) => {
   try {
     if (req.userId === "admin" && req.userRole === "admin") {
       return res.json({
         success: true,
-        user: { _id: "admin", name: "Admin", email: process.env.ADMIN_EMAIL, role: "admin" },
+        user: { id: "admin", _id: "admin", name: "Admin", email: process.env.ADMIN_EMAIL, role: "admin" },
       });
     }
 
-    const user = await userModel.findById(req.userId).select("-password");
+    const user = await userModel.findByPk(req.userId, {
+      attributes: { exclude: ["password"] },
+    });
+
     if (!user) {
       return handleError(res, 404, "User not found");
     }
 
-    res.json({ success: true, user });
+    return res.json({ success: true, user });
   } catch (error) {
     console.error("Profile error:", error);
     return handleError(res, 500, "Server error");
   }
 };
 
-/* ───────── Verify Token (works for ALL roles) ───────── */
 const verifyToken = async (req, res) => {
   try {
     if (req.userId === "admin" && req.userRole === "admin") {
       return res.json({
         success: true,
         valid: true,
-        user: { _id: "admin", name: "Admin", email: process.env.ADMIN_EMAIL, role: "admin" },
+        user: { id: "admin", _id: "admin", name: "Admin", email: process.env.ADMIN_EMAIL, role: "admin" },
       });
     }
 
-    const user = await userModel.findById(req.userId).select("-password");
+    const user = await userModel.findByPk(req.userId, {
+      attributes: { exclude: ["password"] },
+    });
+
     if (!user) {
       return res.json({ success: true, valid: false, message: "User no longer exists" });
     }
 
-    res.json({
+    return res.json({
       success: true,
       valid: true,
-      user: { _id: user._id, name: user.name, email: user.email, role: user.role },
+      user: { id: user.id, _id: user.id, name: user.name, email: user.email, role: user.role },
     });
   } catch (error) {
     console.error("Verify token error:", error);
@@ -163,71 +195,75 @@ const verifyToken = async (req, res) => {
   }
 };
 
-/* ───────── Get All Users (Admin) ───────── */
 const getAllUsers = async (req, res) => {
   try {
-    const users = await userModel.find({}).select("-password").sort({ createdAt: -1 });
-    res.json({ success: true, data: users });
+    const users = await userModel.findAll({
+      attributes: { exclude: ["password"] },
+      order: [["createdAt", "DESC"]],
+    });
+
+    return res.json({ success: true, data: users });
   } catch (error) {
     console.error("Error fetching users:", error);
     return handleError(res, 500, "Error fetching users");
   }
 };
 
-/* ───────── Delete User (Admin) ───────── */
 const deleteUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    if (!userId) {
+    if (!isValidId(userId)) {
       return handleError(res, 400, "User ID required");
     }
 
-    const user = await userModel.findByIdAndDelete(userId);
+    const user = await userModel.findByPk(userId);
     if (!user) {
       return handleError(res, 404, "User not found");
     }
 
-    res.json({ success: true, message: "User deleted successfully" });
+    await user.destroy();
+    return res.json({ success: true, message: "User deleted successfully" });
   } catch (error) {
     console.error("Error deleting user:", error);
     return handleError(res, 500, "Error deleting user");
   }
 };
 
-/* ───────── Update User Role (Admin) ───────── */
 const updateUserRole = async (req, res) => {
   try {
     const { userId } = req.params;
     const { role } = req.body;
 
-    if (!userId) {
+    if (!isValidId(userId)) {
       return handleError(res, 400, "User ID required");
     }
+
     if (!role || !["user", "seller", "admin"].includes(role)) {
       return handleError(res, 400, "Valid role required (user, seller, admin)");
     }
 
-    const user = await userModel.findByIdAndUpdate(userId, { role }, { new: true }).select("-password");
+    const user = await userModel.findByPk(userId, { attributes: { exclude: ["password"] } });
     if (!user) {
       return handleError(res, 404, "User not found");
     }
 
-    res.json({ success: true, message: "User role updated", data: user });
+    await user.update({ role });
+    return res.json({ success: true, message: "User role updated", data: { ...user.toJSON(), id: user.id, _id: user.id } });
   } catch (error) {
     console.error("Error updating user role:", error);
     return handleError(res, 500, "Error updating user role");
   }
 };
 
-/* ───────── Wishlist Endpoints ───────── */
 const getWishlist = async (req, res) => {
   try {
-    const user = await userModel.findById(req.userId);
+    const user = await userModel.findByPk(req.userId);
     if (!user) return handleError(res, 404, "User not found");
-    await user.populate("wishlist");
-    res.json({ success: true, wishlist: user.wishlist });
+
+    const wishlist = await user.getSarees();
+    return res.json({ success: true, wishlist });
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching wishlist:", error);
     return handleError(res, 500, "Error fetching wishlist");
   }
 };
@@ -235,21 +271,23 @@ const getWishlist = async (req, res) => {
 const addToWishlist = async (req, res) => {
   try {
     const { sareeId } = req.body;
-    if (!sareeId) return handleError(res, 400, "sareeId required");
+    if (!isValidId(sareeId)) return handleError(res, 400, "Valid sareeId required");
 
-    const user = await userModel.findById(req.userId);
+    const user = await userModel.findByPk(req.userId);
     if (!user) return handleError(res, 404, "User not found");
-    if (!user.wishlist) user.wishlist = [];
 
-    const exists = user.wishlist.map((id) => id.toString()).includes(sareeId.toString());
-    if (!exists) {
-      user.wishlist.push(sareeId);
-      await user.save();
+    const saree = await sareeModel.findByPk(sareeId);
+    if (!saree) return handleError(res, 404, "Saree not found");
+
+    const alreadyAdded = await user.hasSaree(saree);
+    if (!alreadyAdded) {
+      await user.addSaree(saree);
     }
-    await user.populate("wishlist");
-    res.json({ success: true, wishlist: user.wishlist });
+
+    const wishlist = await user.getSarees();
+    return res.json({ success: true, wishlist });
   } catch (error) {
-    console.error(error);
+    console.error("Error adding to wishlist:", error);
     return handleError(res, 500, "Error adding to wishlist");
   }
 };
@@ -257,17 +295,19 @@ const addToWishlist = async (req, res) => {
 const removeFromWishlist = async (req, res) => {
   try {
     const { sareeId } = req.body;
-    if (!sareeId) return handleError(res, 400, "sareeId required");
+    if (!isValidId(sareeId)) return handleError(res, 400, "Valid sareeId required");
 
-    const user = await userModel.findById(req.userId);
+    const user = await userModel.findByPk(req.userId);
     if (!user) return handleError(res, 404, "User not found");
 
-    user.wishlist = (user.wishlist || []).filter((id) => id.toString() !== sareeId.toString());
-    await user.save();
-    await user.populate("wishlist");
-    res.json({ success: true, wishlist: user.wishlist });
+    const saree = await sareeModel.findByPk(sareeId);
+    if (!saree) return handleError(res, 404, "Saree not found");
+
+    await user.removeSaree(saree);
+    const wishlist = await user.getSarees();
+    return res.json({ success: true, wishlist });
   } catch (error) {
-    console.error(error);
+    console.error("Error removing from wishlist:", error);
     return handleError(res, 500, "Error removing from wishlist");
   }
 };

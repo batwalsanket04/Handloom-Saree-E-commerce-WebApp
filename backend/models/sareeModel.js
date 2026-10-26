@@ -1,25 +1,78 @@
-import mongoose from "mongoose";
+import { DataTypes } from "sequelize";
+import sequelize from "../config/db.js";
+ 
 
-const sareeSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  price: { type: Number, required: true },
-  category: { type: String, required: true },
-  image: { type: String, required: true },
-  imagePublicId: { type: String, default: null },
-  stock: { type: Number, default: 1000, min: 0 },
-sellerId: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: false },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
+const Saree = sequelize.define(
+  "Saree",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
 
-// Performance indexes
-sareeSchema.index({ category: 1 });
-sareeSchema.index({ name: "text", description: "text", category: "text" });
-sareeSchema.index({ createdAt: -1 });
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
 
-const sareeModel =
-  mongoose.models.saree || mongoose.model("saree", sareeSchema);
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
 
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
 
-export default sareeModel;
+    category: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+
+    image: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+
+    imagePublicId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null,
+    },
+
+    stock: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1000,
+      validate: {
+        min: 0,
+      },
+    },
+
+    sellerId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: "users",
+        key: "id",
+      },
+    },
+  },
+  {
+    tableName: "sarees",
+    timestamps: true,
+
+    indexes: [
+      {
+        fields: ["category"],
+      },
+      {
+        fields: ["createdAt"],
+      },
+    ],
+  }
+);
+
+export default Saree;

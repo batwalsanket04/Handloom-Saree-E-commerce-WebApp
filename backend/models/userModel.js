@@ -1,22 +1,73 @@
-import mongoose from "mongoose";
+import { DataTypes } from "sequelize";
+import sequelize from "../config/db.js";
 
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true, trim: true },
-  email: { type: String, required: true, unique: true, lowercase: true, index: true },
-  password: { type: String, required: true },
-  role: { type: String, enum: ["user", "seller", "admin"], default: "user", index: true },
-  cartData: { type: Object, default: {} },
-  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "saree" }],
-  phone: { type: String, default: "" },
-  address: { type: String, default: "" },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-}, { minimize: false });
+const User = sequelize.define(
+  "User",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
 
-// Performance indexes
-userSchema.index({ createdAt: -1 });
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
 
-const userModel = mongoose.models.user || mongoose.model("user", userSchema);
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true,
+      },
+    },
 
-export default userModel;
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
 
+    role: {
+      type: DataTypes.ENUM("user", "seller", "admin"),
+      allowNull: false,
+      defaultValue: "user",
+    },
+
+    cartData: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+      defaultValue: {},
+    },
+
+    phone: {
+      type: DataTypes.STRING,
+      defaultValue: "",
+    },
+
+    address: {
+      type: DataTypes.TEXT,
+      defaultValue: "",
+    },
+  },
+  {
+    tableName: "users",
+    timestamps: true, // Automatically creates createdAt & updatedAt
+
+    indexes: [
+      {
+        unique: true,
+        fields: ["email"],
+      },
+      {
+        fields: ["role"],
+      },
+      {
+        fields: ["createdAt"],
+      },
+    ],
+  }
+);
+
+export default User;

@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
-import { connectDB } from "./config/db.js";
+import cookieParser from "cookie-parser";
+ 
+import Sequelize from "./config/db.js";
+import "./models/index.js"
 import sareeRouter from "./routes/sareeRouter.js";
 import userRouter from "./routes/userRoute.js";
 import wishlistRouter from "./routes/wishlistRoute.js";
@@ -19,6 +22,7 @@ app.disable("x-powered-by");
 // Body parsing with size limits
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(cookieParser());
 
 // CORS configuration
 app.use(
@@ -42,6 +46,30 @@ app.use(
     credentials: true,
   })
 );
+
+console.log({
+ DB_USERNAME: process.env.DB_USERNAME,
+ DB_USER: process.env.DB_USER,
+ DB_HOST: process.env.DB_HOST
+});
+
+const connectDB = async () => {
+  try {
+
+    await Sequelize.authenticate();
+
+    console.log("PostgreSQL Connected Successfully");
+
+  } catch(error) {
+
+    console.log(error.message);
+
+    process.exit(1);
+
+  }
+};
+
+
 
 connectDB();
 
@@ -75,15 +103,17 @@ app.use((err, req, res, next) => {
     return res.status(400).json({ success: false, message: "Validation Error", errors: messages });
   }
 
-  // Mongoose duplicate key
-  if (err.code === 11000) {
-    return res.status(409).json({ success: false, message: "Duplicate field value", field: Object.keys(err.keyValue) });
-  }
+  // pg duplicate key
+ if(err.name === "sequelizeUniqueConstraintError"){
 
-  // Mongoose cast error (invalid ObjectId)
-  if (err.name === "CastError") {
-    return res.status(400).json({ success: false, message: `Invalid ${err.path}: ${err.value}` });
-  }
+ return res.status(409).json({
+   success:false,
+   message:"Duplicate field value"
+ });
+
+}
+ 
+ 
 
   // JWT errors
   if (err.name === "JsonWebTokenError") {

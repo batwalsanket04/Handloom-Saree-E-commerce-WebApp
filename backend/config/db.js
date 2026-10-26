@@ -1,21 +1,18 @@
-// config/db.js
-import mongoose from "mongoose";
+import { Sequelize } from "sequelize";
+import "dotenv/config";
 
-export const connectDB = async () => {
-  try {
-   const uri = process.env.MONGODB_URI;
 
-if (!uri) {
-  throw new Error("MONGODB_URI is not defined in environment variables");
-}
-    console.log("Connecting to MongoDB...");
-    const conn = await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error(`Error: ${error.message}`);
-    process.exit(1);
-  }
-};
+const sequelize = new Sequelize(
+    process.env.DB_NAME,        // database name
+    process.env.DB_USERNAME,    // postgres username
+    process.env.DB_PASSWORD,    // password
+    {
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT || 5432,
+        dialect: process.env.DIALECT,
+        logging: false,
+    }
+);
+
+
+export default sequelize;

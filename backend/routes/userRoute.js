@@ -10,6 +10,7 @@ import {
   updateUserRole,
 } from "../controller/userController.js";
 import authMiddleware, { authorizeAdmin } from "../middlewere/auth.js";
+import { logout, refreshToken } from "../controller/authController.js";
 
 const userRouter = express.Router();
 
@@ -21,6 +22,8 @@ userRouter.post("/admin-login", adminLogin);
 // Protected routes
 userRouter.get("/profile", authMiddleware, getProfile);
 userRouter.get("/verify-token", authMiddleware, verifyToken);
+userRouter.post("/refresh-token",refreshToken)
+userRouter.post("/logout",logout)
 
 // Admin routes
 userRouter.get("/list", authMiddleware, authorizeAdmin, getAllUsers);

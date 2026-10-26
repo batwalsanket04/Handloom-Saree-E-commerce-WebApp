@@ -19,16 +19,14 @@ const router = express.Router();
 router.get("/list", listSaree);
 router.get("/search", searchSarees);
 router.get("/related/:id", relatedSarees);
-router.get("/:id", getSareeDetails);
 
-// Admin only routes
+// Seller and admin routes (register these before generic /:id)
 router.post("/add", authMiddleware, authorizeAdmin, upload.single("image"), addSaree);
 router.delete("/remove/:id", authMiddleware, authorizeAdmin, removeSaree);
-
-// Seller routes (admin can also do)
 router.post("/seller/add", authMiddleware, authorizeSeller, upload.single("image"), addSaree);
 router.put("/seller/:id", authMiddleware, authorizeSeller, upload.single("image"), updateSaree);
 router.delete("/seller/remove/:id", authMiddleware, authorizeSeller, removeSaree);
 router.get("/seller/list", authMiddleware, authorizeSeller, getSareesBySeller);
+router.get("/:id", getSareeDetails);
 
 export default router;

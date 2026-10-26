@@ -1,9 +1,9 @@
 // src/components/LoginPopUp.jsx
 import React, { useContext, useState } from "react";
-import axios from "axios";
  import { context } from "../../Context/StoreContext";
 import { FaXmark } from "react-icons/fa6";
 import { toast } from "react-toastify";
+import api from "../../api/axios";
 
 const LoginPopUp = ({ setShowLogine }) => {
  const { login, url } = useContext(context);
@@ -20,16 +20,38 @@ const LoginPopUp = ({ setShowLogine }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const endpoint = currState === "Sign Up" ? `${url}/api/user/register` : `${url}/api/user/login`;
-      const res = await axios.post(endpoint, data);
+    const endpoint =
+currState === "Sign Up"
+? "/user/register"
+: "/user/login";
 
-      if (res.data.success) {
-        login(res.data.user, res.data.token);
-        setShowLogine(false);
-        toast.success(currState === "Sign Up" ? "Account created successfully!" : "Logged in successfully!");
-      } else {
-        toast.error(res.data.message);
-      }
+
+const res = await api.post(
+ endpoint,
+ data
+);
+if(res.data.success){
+
+  login(
+    res.data.user,
+    res.data.accessToken
+  );
+
+
+  setShowLogine(false);
+
+  toast.success(
+    currState === "Sign Up"
+    ? "Account created successfully!"
+    : "Logged in successfully!"
+  );
+
+}
+else{
+
+ toast.error(res.data.message);
+
+}
     } catch (err) {
       console.error(err);
       toast.error("Server Error");

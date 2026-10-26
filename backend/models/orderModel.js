@@ -1,21 +1,82 @@
-import mongoose from "mongoose";
+ import { DataTypes } from "sequelize";
+ import sequelize from "../config/db.js";
+ import User from "./userModel.js";
 
-const orderSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true, index: true },
-  items: { type: Array, required: true },
-  amount: { type: Number, required: true, min: 0 },
-  address: { type: Object, required: true },
-  status: { type: String, default: "Order Processing" },
-  payment: { type: Boolean, default: false },
-  transactionId: { type: String, default: null },
-  date: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
+const Order = sequelize.define(
+  "Order",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
 
-// Performance indexes
-orderSchema.index({ userId: 1, date: -1 });
-orderSchema.index({ status: 1, date: -1 });
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "users",
+        key: "id",
+      },
+    },
 
-const orderModel = mongoose.models.order || mongoose.model("order", orderSchema);
+    // Store ordered products as JSON
+    items: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+      defaultValue: [],
+    },
 
-export default orderModel;
+    amount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      validate: {
+        min: 0,
+      },
+    },
+
+    // Shipping address
+    address: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+    },
+
+    status: {
+      type: DataTypes.ENUM(
+        "Order Processing",
+        "Packed",
+        "Shipped",
+        "Out For Delivery",
+        "Delivered",
+        "Cancelled"
+      ),
+      defaultValue: "Order Processing",
+    },
+
+    payment: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+
+    transactionId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null,
+    },
+  },
+  {
+    tableName: "orders",
+    timestamps: true,
+
+    indexes: [
+      {
+        fields: ["userId", "createdAt"],
+      },
+      {
+        fields: ["status", "createdAt"],
+      },
+    ],
+  }
+);
+
+export default Order;
