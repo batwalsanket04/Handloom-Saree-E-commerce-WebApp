@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useAuth } from '../../Componants/AuthContext/AuthContext';
+import api from "../../api/axios";
 
-const Dashboard = ({ url }) => {
+const Dashboard = () => {
   const { token } = useAuth();
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -20,17 +20,13 @@ const Dashboard = ({ url }) => {
         setLoading(true);
 
         // Fetch users
-        const usersRes = await axios.get(`${url}/api/user/list`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const usersRes = await api.get("/user/list");
 
         // Fetch orders
-        const ordersRes = await axios.get(`${url}/api/orders/list`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const ordersRes = await api.get("/orders/list");
 
         // Fetch sarees
-        const sareesRes = await axios.get(`${url}/api/saree/list`);
+        const sareesRes = await api.get("/saree/list");
 
         // Calculate stats
         const orders = ordersRes.data.data || [];
@@ -56,14 +52,13 @@ const Dashboard = ({ url }) => {
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
-        alert('Failed to load dashboard statistics');
       } finally {
         setLoading(false);
       }
     };
 
     fetchStats();
-  }, [url, token]);
+  }, [token]);
 
   if (loading) {
     return (

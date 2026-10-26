@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useAuth } from "../../Componants/AuthContext/AuthContext";
+import api from "../../api/axios";
 
-const UserManagement = ({ url }) => {
+const UserManagement = () => {
   const [users, setUsers] = useState([]);
-  const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -12,16 +10,13 @@ const UserManagement = ({ url }) => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${url}/api/user/list`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get("/user/list");
 
       if (res.data.success) {
         setUsers(res.data.data);
       }
     } catch (error) {
       console.error("Failed to fetch users:", error);
-      alert("Failed to fetch users");
     } finally {
       setLoading(false);
     }
@@ -32,9 +27,7 @@ const UserManagement = ({ url }) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
 
     try {
-      const res = await axios.delete(`${url}/api/user/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.delete(`/user/${userId}`);
 
       if (res.data.success) {
         setUsers(users.filter(u => u._id !== userId));
@@ -42,18 +35,13 @@ const UserManagement = ({ url }) => {
       }
     } catch (error) {
       console.error("Failed to delete user:", error);
-      alert("Failed to delete user");
     }
   };
 
   // Update user role
   const updateRole = async (userId, newRole) => {
     try {
-      const res = await axios.put(
-        `${url}/api/user/${userId}/role`,
-        { role: newRole },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.put(`/user/${userId}/role`, { role: newRole });
 
       if (res.data.success) {
         fetchUsers(); // Refresh the list
@@ -61,7 +49,6 @@ const UserManagement = ({ url }) => {
       }
     } catch (error) {
       console.error("Failed to update role:", error);
-      alert("Failed to update role");
     }
   };
 

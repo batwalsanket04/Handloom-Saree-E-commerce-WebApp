@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../Componants/AuthContext/AuthContext";
+import api from "../../api/axios";
 
-const Login = ({ url }) => {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -15,7 +16,7 @@ const Login = ({ url }) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post(`${url}/api/user/admin-login`, { email, password });
+      const res = await api.post("/user/admin-login", { email, password });
       if (res.data.success && res.data.user) {
         if (res.data.user.role !== "admin") {
           toast.error("Admin access required");
@@ -32,8 +33,14 @@ const Login = ({ url }) => {
         toast.error(res.data.message || "Login failed");
       }
     } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Server error");
+      console.error("Admin login failed:", err);
+      const validationErrors = err.response?.data?.errors;
+
+      if (validationErrors && typeof validationErrors === "object") {
+        setErrors(validationErrors);
+      } else if (err.response?.status === 401) {
+        setErrors({ password: "Invalid email or password" });
+      }
     } finally {
       setLoading(false);
     }
@@ -43,19 +50,40 @@ const Login = ({ url }) => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm">
         <h2 className="text-xl font-semibold mb-4">Admin Login</h2>
-        <input 
-          className="w-full p-2 mb-3 border rounded" 
+        <input
+          type="email"
+          className={`w-full p-2 border rounded ${errors.email ? "border-red-500" : ""}`}
           placeholder="Email" 
           value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setErrors((current) => ({ ...current, email: "" }));
+          }}
+          aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? "admin-email-error" : undefined}
         />
-        <input 
+        {errors.email && (
+          <p id="admin-email-error" className="mb-3 text-sm text-red-600" role="alert">
+            {errors.email}
+          </p>
+        )}
+        <input
           type="password" 
-          className="w-full p-2 mb-3 border rounded" 
+          className={`w-full p-2 border rounded ${errors.password ? "border-red-500" : ""}`}
           placeholder="Password" 
           value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setErrors((current) => ({ ...current, password: "" }));
+          }}
+          aria-invalid={Boolean(errors.password)}
+          aria-describedby={errors.password ? "admin-password-error" : undefined}
         />
+        {errors.password && (
+          <p id="admin-password-error" className="mb-3 text-sm text-red-600" role="alert">
+            {errors.password}
+          </p>
+        )}
         <button 
           disabled={loading} 
           className="w-full bg-pink-600 text-white py-2 rounded"

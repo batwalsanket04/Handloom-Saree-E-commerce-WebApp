@@ -12,6 +12,8 @@ import {
 } from "../controller/sareeController.js";
 import upload from "../uploads/Upload.js";
 import authMiddleware, { authorizeAdmin, authorizeSeller } from "../middlewere/auth.js";
+import validate from "../middlewere/validate.middleware.js";
+import { addSareeSchema, updateSareeSchema } from "../Validator/saree.validator.js";
 
 const router = express.Router();
 
@@ -21,10 +23,10 @@ router.get("/search", searchSarees);
 router.get("/related/:id", relatedSarees);
 
 // Seller and admin routes (register these before generic /:id)
-router.post("/add", authMiddleware, authorizeAdmin, upload.single("image"), addSaree);
+router.post("/add", authMiddleware, authorizeAdmin, upload.single("image"), validate(addSareeSchema), addSaree);
 router.delete("/remove/:id", authMiddleware, authorizeAdmin, removeSaree);
-router.post("/seller/add", authMiddleware, authorizeSeller, upload.single("image"), addSaree);
-router.put("/seller/:id", authMiddleware, authorizeSeller, upload.single("image"), updateSaree);
+router.post("/seller/add", authMiddleware, authorizeSeller, upload.single("image"), validate(addSareeSchema), addSaree);
+router.put("/seller/:id", authMiddleware, authorizeSeller, upload.single("image"), validate(updateSareeSchema), updateSaree);
 router.delete("/seller/remove/:id", authMiddleware, authorizeSeller, removeSaree);
 router.get("/seller/list", authMiddleware, authorizeSeller, getSareesBySeller);
 router.get("/:id", getSareeDetails);

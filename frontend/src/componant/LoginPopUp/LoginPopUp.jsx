@@ -6,16 +6,30 @@ import { toast } from "react-toastify";
 import api from "../../api/axios";
 
 const LoginPopUp = ({ setShowLogine }) => {
- const { login, url } = useContext(context);
+ const { login } = useContext(context);
   const [currState, setCurrState] = useState("Sign Up");
+  const [errors,setErrors]=useState({});
   const [data, setData] = useState({ name: "", email: "", password: "" });
 
   const toggleForm = () => setCurrState(currState === "Sign Up" ? "Sign In" : "Sign Up");
 
   const formHandle = (e) => {
-    const { name, value } = e.target;
-    setData({ ...data, [name]: value });
-  };
+
+const { name, value } = e.target;
+
+
+setData({
+ ...data,
+ [name]:value
+});
+
+
+setErrors({
+ ...errors,
+ [name]:""
+});
+
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,10 +40,12 @@ currState === "Sign Up"
 : "/user/login";
 
 
-const res = await api.post(
- endpoint,
- data
-);
+const payload =
+  currState === "Sign Up"
+    ? data
+    : { email: data.email, password: data.password };
+
+const res = await api.post(endpoint, payload);
 if(res.data.success){
 
   login(
@@ -53,8 +69,13 @@ else{
 
 }
     } catch (err) {
-      console.error(err);
-      toast.error("Server Error");
+      const validationErrors = err.response?.data?.errors;
+
+      if (validationErrors && typeof validationErrors === "object") {
+        setErrors(validationErrors);
+      } else if (currState === "Sign In" && err.response?.status === 401) {
+        setErrors({ password: "Invalid email or password" });
+      }
     }
   };
 
@@ -111,6 +132,15 @@ else{
           required
           className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-600 transition"
         />
+        {
+errors.email && (
+
+<p className="text-red-500 text-sm mt-1">
+{errors.email}
+</p>
+
+)
+}
       </div>
 
       <div>
@@ -130,6 +160,15 @@ else{
           required
           className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-600 transition"
         />
+       {
+errors.password && (
+
+<p className="text-red-500 text-sm mt-1">
+{errors.password}
+</p>
+
+)
+}
       </div>
 
       <button

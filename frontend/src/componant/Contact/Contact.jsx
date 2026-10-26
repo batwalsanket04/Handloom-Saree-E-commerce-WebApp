@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { MapPin, Mail, Phone } from "lucide-react";
-import axios from "axios";
+import api from "../../api/axios";
 
 const Contact = () => {
 
@@ -24,10 +24,7 @@ const Contact = () => {
         console.log(contact)
   
         try{
-        await axios.post(
-  "https://handloom-saree-e-commerce-webapp-1-hcwc.onrender.com/api/contact",
-  contact
-);
+        await api.post("/contact", contact);
          console.log("data Saved:",contact)
 
          window.confirm("Message Send Successfully");
@@ -36,7 +33,6 @@ const Contact = () => {
 
         } catch (err)
         {
-          alert("Data Sending failed..")
           console.log("Error:",err);
         }
     }

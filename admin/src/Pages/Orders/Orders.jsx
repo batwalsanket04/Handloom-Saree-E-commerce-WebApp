@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
+import api from "../../api/axios";
 
-const Orders = ({ url }) => {
+const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,22 +13,13 @@ const Orders = ({ url }) => {
       setLoading(true);
       setError(null);
       
-      const token = localStorage.getItem("token");
-      console.log("Fetching orders with token:", token ? "Token exists" : "No token");
-      
-      if (!token) {
+      if (!localStorage.getItem("token")) {
         setError("No authentication token found. Please login.");
         setLoading(false);
         return;
       }
 
-      // Fixed: Use /api/orders/list (plural) to match backend route
-      const response = await axios.get(`${url}/api/orders/list`, { 
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      }); 
+      const response = await api.get("/orders/list");
       
       console.log("Orders response:", response.data);
       
@@ -40,18 +31,12 @@ const Orders = ({ url }) => {
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
-      console.error("Error response:", error.response);
-      
-      if (error.response?.status === 401) {
-        setError("Authentication failed. Please login again.");
-        toast.error("Please login again");
-      } else if (error.response?.status === 403) {
-        setError("Admin access required.");
-        toast.error("Admin access required");
-      } else {
-        setError(error.response?.data?.message || "Server error while fetching orders");
-        toast.error(error.response?.data?.message || "Server error while fetching orders!");
-      }
+      const validationErrors = error.response?.data?.errors;
+      setError(
+        Array.isArray(validationErrors)
+          ? validationErrors.map((item) => typeof item === "string" ? item : item.message).join("\n")
+          : error.response?.data?.message || "Unable to fetch orders."
+      );
     } finally {
       setLoading(false);
     }
@@ -60,13 +45,7 @@ const Orders = ({ url }) => {
   // Update order status
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      const token = localStorage.getItem("token");
-      
-      // Fixed: Use /api/orders/update (plural) to match backend route
-      const response = await axios.post(`${url}/api/orders/update/${orderId}`, 
-        { status: newStatus }, 
-        { headers: { Authorization: `Bearer ${token}` }}
-      );
+      const response = await api.post(`/orders/update/${orderId}`, { status: newStatus });
 
       if (response.data.success) {
         toast.success("Order status updated!");
@@ -76,7 +55,6 @@ const Orders = ({ url }) => {
       }
     } catch (error) {
       console.error("Error updating order status:", error);
-      toast.error(error.response?.data?.message || "Server error while updating status!");
     }
   };
 

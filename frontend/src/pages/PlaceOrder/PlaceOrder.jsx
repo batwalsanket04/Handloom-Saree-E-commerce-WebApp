@@ -1,11 +1,11 @@
 import React, { useContext, useState, useEffect } from "react";
 import { context } from "../../Context/StoreContext";
-import axios from "axios";
+import api from "../../api/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const PlaceOrder = () => {
-  const { getTotalCartAmount, token, sarees, cartItem, url, user } =
+  const { getTotalCartAmount, token, sarees, cartItem, user } =
     useContext(context);
 
   const [delivery, setDelivery] = useState({
@@ -57,10 +57,7 @@ const PlaceOrder = () => {
 
       if (paymentMethod === "stripe") {
         // STRIPE PAYMENT
-        const response = await axios.post(
-          `${url}/api/orders/place`,
-          orderData
-        );
+        const response = await api.post("/orders/place", orderData);
 
         if (response.data.success) {
           window.location.replace(response.data.session_url);
@@ -69,10 +66,7 @@ const PlaceOrder = () => {
         }
       } else if (paymentMethod === "cod") {
         // CASH ON DELIVERY
-        const response = await axios.post(
-          `${url}/api/orders/cod`,
-          orderData
-        );
+        const response = await api.post("/orders/cod", orderData);
 
         if (response.data.success) {
           toast.success("COD order placed successfully!");
@@ -85,7 +79,6 @@ const PlaceOrder = () => {
       }
     } catch (error) {
       console.error("Error during order placement:", error);
-      toast.error("Something went wrong. Please try again.");
     }
   };
 

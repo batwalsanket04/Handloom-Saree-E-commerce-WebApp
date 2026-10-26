@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { FaTrash } from "react-icons/fa";
+import api from "../../api/axios";
 
-const List = ({ url = "http://localhost:4000" }) => {
+const List = () => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -11,15 +11,7 @@ const List = ({ url = "http://localhost:4000" }) => {
   const fetchList = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      console.log("Fetching list with token:", token ? "Token exists" : "No token");
-      
-      const res = await axios.get(`${url}/api/saree/list`, { 
-        headers: { 
-          Authorization: token ? `Bearer ${token}` : "",
-          "Content-Type": "application/json"
-        } 
-      });
+      const res = await api.get("/saree/list");
       
       console.log("List response:", res.data);
       
@@ -30,8 +22,6 @@ const List = ({ url = "http://localhost:4000" }) => {
       }
     } catch (err) {
       console.error("Error fetching list:", err);
-      console.error("Error response:", err.response);
-      toast.error("Server error");
     } finally {
       setLoading(false);
     }
@@ -40,10 +30,7 @@ const List = ({ url = "http://localhost:4000" }) => {
   // Delete a saree by ID
   const removeItem = async (_id) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.delete(`${url}/api/saree/remove/${_id}`, { 
-        headers: { Authorization: token ? `Bearer ${token}` : "" } 
-      });
+      const res = await api.delete(`/saree/remove/${_id}`);
       if (res.data.success) {
         toast.success(res.data.message);
         fetchList(); // Refresh list after deletion
@@ -51,8 +38,7 @@ const List = ({ url = "http://localhost:4000" }) => {
         toast.error("Failed to delete item");
       }
     } catch (err) {
-      console.error(err);
-      toast.error("Server error");
+      console.error("Failed to delete saree:", err);
     }
   };
 

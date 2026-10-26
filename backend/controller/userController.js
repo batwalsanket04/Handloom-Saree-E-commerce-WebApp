@@ -3,7 +3,6 @@ import sareeModel from "../models/sareeModel.js";
 import RefreshToken from "../models/refreshtoken.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import validator from "validator";
 
 const isValidId = (id) => Number.isSafeInteger(Number(id)) && Number(id) > 0;
 
@@ -41,12 +40,10 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return handleError(res, 400, "Email and password are required");
-    }
-
     const user = await userModel.findOne({
-      where: { email: String(email).trim().toLowerCase() },
+      where: {
+        email: email.toLowerCase(),
+      },
     });
 
     if (!user) {
@@ -54,18 +51,26 @@ const loginUser = async (req, res) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
       return handleError(res, 401, "Invalid credentials");
     }
 
-    const token = createToken(user.id, user.role);
+    const accessToken = createToken(user.id, user.role);
+
     await saveRefreshToken(user, res);
+
     return res.json({
       success: true,
-      token,
-      accessToken: token,
-      user: { id: user.id, _id: user.id, name: user.name, email: user.email, role: user.role },
+      accessToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
+
   } catch (error) {
     console.error("Login error:", error);
     return handleError(res, 500, "Server error during login");
@@ -75,10 +80,6 @@ const loginUser = async (req, res) => {
 const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return handleError(res, 400, "Email and password are required");
-    }
 
     if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
       return handleError(res, 401, "Invalid admin credentials");
@@ -97,51 +98,109 @@ const adminLogin = async (req, res) => {
   }
 };
 
-const registerUser = async (req, res) => {
-  try {
-    const { name, password, email } = req.body;
+const registerUser = async(req,res)=>{
 
-    if (!name || !email || !password) {
-      return handleError(res, 400, "Name, email, and password are required");
-    }
+try{
 
-    const normalizedEmail = String(email).trim().toLowerCase();
-    const existingUser = await userModel.findOne({ where: { email: normalizedEmail } });
 
-    if (existingUser) {
-      return handleError(res, 409, "User already exists");
-    }
+const {
+name,
+email,
+mobile,
+password
+}=req.body;
 
-    if (!validator.isEmail(normalizedEmail)) {
-      return handleError(res, 400, "Please enter a valid email");
-    }
 
-    if (password.length < 8) {
-      return handleError(res, 400, "Password must be at least 8 characters");
-    }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await userModel.create({
-      name: String(name).trim(),
-      email: normalizedEmail,
-      password: hashedPassword,
-      role: "user",
-    });
+const normalizedEmail=email
+?.trim()
+.toLowerCase();
 
-    const token = createToken(user.id, user.role);
-    await saveRefreshToken(user, res);
-    return res.status(201).json({
-      success: true,
-      token,
-      accessToken: token,
-      user: { id: user.id, _id: user.id, name: user.name, email: user.email, role: user.role },
-    });
-  } catch (error) {
-    console.error("Registration error:", error);
-    return handleError(res, 500, "Server error during registration");
-  }
-};
 
+
+const existingUser =
+await userModel.findOne({
+where:{
+email:normalizedEmail
+}
+});
+
+
+if(existingUser){
+
+return handleError(
+res,
+409,
+"User already exists"
+);
+
+}
+
+
+
+const hashedPassword =
+await bcrypt.hash(password,10);
+
+
+
+const user =
+await userModel.create({
+
+name:name.trim(),
+
+email:normalizedEmail,
+
+mobile,
+
+password:hashedPassword,
+
+role:"user"
+
+});
+
+
+
+const token=createToken(
+user.id,
+user.role
+);
+
+
+
+await saveRefreshToken(user,res);
+
+
+
+return res.status(201).json({
+
+success:true,
+
+accessToken:token,
+
+user:{
+id:user.id,
+name:user.name,
+email:user.email,
+role:user.role
+}
+
+});
+
+
+}
+catch(error){
+
+console.log(error);
+
+return handleError(
+res,
+500,
+"Server Error"
+);
+
+}
+
+}
 const getProfile = async (req, res) => {
   try {
     if (req.userId === "admin" && req.userRole === "admin") {
@@ -238,10 +297,6 @@ const updateUserRole = async (req, res) => {
       return handleError(res, 400, "User ID required");
     }
 
-    if (!role || !["user", "seller", "admin"].includes(role)) {
-      return handleError(res, 400, "Valid role required (user, seller, admin)");
-    }
-
     const user = await userModel.findByPk(userId, { attributes: { exclude: ["password"] } });
     if (!user) {
       return handleError(res, 404, "User not found");
@@ -271,7 +326,6 @@ const getWishlist = async (req, res) => {
 const addToWishlist = async (req, res) => {
   try {
     const { sareeId } = req.body;
-    if (!isValidId(sareeId)) return handleError(res, 400, "Valid sareeId required");
 
     const user = await userModel.findByPk(req.userId);
     if (!user) return handleError(res, 404, "User not found");
@@ -295,7 +349,6 @@ const addToWishlist = async (req, res) => {
 const removeFromWishlist = async (req, res) => {
   try {
     const { sareeId } = req.body;
-    if (!isValidId(sareeId)) return handleError(res, 400, "Valid sareeId required");
 
     const user = await userModel.findByPk(req.userId);
     if (!user) return handleError(res, 404, "User not found");

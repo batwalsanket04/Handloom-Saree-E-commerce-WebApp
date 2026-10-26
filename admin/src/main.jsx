@@ -7,12 +7,10 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AuthProvider from "./Componants/AuthContext/AuthContext.jsx";
 
-const url = "http://localhost:4000";
-
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      <AuthProvider url={url}>
+      <AuthProvider>
         <App />
         <ToastContainer
           position="top-center"

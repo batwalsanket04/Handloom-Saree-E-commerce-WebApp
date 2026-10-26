@@ -1,18 +1,16 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { context } from "../../Context/StoreContext";
-import axios from "axios";
+import api from "../../api/axios";
 
 const Verify = () => {
   const [searchParams] = useSearchParams();
   const success = searchParams.get("success");
   const orderId = searchParams.get("orderId");
-  const { url } = useContext(context);
   const navigate = useNavigate();
 
   const verifyPayment = async () => {
     try {
-      const res = await axios.post(`${url}/api/orders/verify`, {
+      const res = await api.post("/orders/verify", {
         success: success === "true",
         orderId,
       });

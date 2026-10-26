@@ -1,16 +1,10 @@
 import userModel from "../models/userModel.js";
 import sareeModel from "../models/sareeModel.js";
 
-const isValidId = (id) => Number.isSafeInteger(Number(id)) && Number(id) > 0;
-
 const addToCart = async (req, res) => {
   try {
     const userId = req.userId;
     const { id } = req.body;
-
-    if (!isValidId(id)) {
-      return res.status(400).json({ success: false, message: "Product ID required" });
-    }
 
     const user = await userModel.findByPk(userId);
     if (!user) {
@@ -45,10 +39,6 @@ const removeFromCart = async (req, res) => {
   try {
     const userId = req.userId;
     const { id } = req.body;
-
-    if (!isValidId(id)) {
-      return res.status(400).json({ success: false, message: "Product ID required" });
-    }
 
     const user = await userModel.findByPk(userId);
     if (!user) {

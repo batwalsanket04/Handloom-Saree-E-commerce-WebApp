@@ -14,16 +14,7 @@ const deductStock = async (items) => {
 
   for (const item of items) {
     const productId = item._id || item.id;
-    if (!isValidId(productId)) {
-      errors.push("Each order item must include a valid product ID");
-      continue;
-    }
-
-    const qty = Number(item.quantity ?? 1);
-    if (!Number.isFinite(qty) || qty <= 0) {
-      errors.push(`Invalid quantity for product ${productId}`);
-      continue;
-    }
+    const qty = item.quantity;
 
     const product = await sareeModel.findByPk(productId);
     if (!product) {
@@ -47,16 +38,6 @@ const placeOrder = async (req, res) => {
   try {
     const { items, amount, address, paymentMethod } = req.body;
     const userId = req.userId;
-
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ success: false, message: "Items required" });
-    }
-    if (!address) {
-      return res.status(400).json({ success: false, message: "Address required" });
-    }
-    if (!Number.isFinite(Number(amount)) || Number(amount) <= 0) {
-      return res.status(400).json({ success: false, message: "Invalid amount" });
-    }
 
     const stockErrors = await deductStock(items);
     if (stockErrors.length > 0) {
@@ -114,10 +95,6 @@ const placeOrder = async (req, res) => {
 const verifyOrder = async (req, res) => {
   try {
     const { orderId, success } = req.body;
-
-    if (!isValidId(orderId)) {
-      return res.status(400).json({ success: false, message: "Order ID required" });
-    }
 
     const order = await orderModel.findByPk(orderId);
     if (!order) {
@@ -184,23 +161,6 @@ const updateOrderStatus = async (req, res) => {
 
     const { status } = req.body;
 
-    if (!status) {
-      return res.status(400).json({ success: false, message: "Status required" });
-    }
-
-    const validStatuses = [
-      "Order Processing",
-      "Packed",
-      "Shipped",
-      "Out For Delivery",
-      "Delivered",
-      "Cancelled",
-    ];
-
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ success: false, message: "Invalid status" });
-    }
-
     const order = await orderModel.findByPk(orderId);
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found" });
@@ -218,16 +178,6 @@ const placeCodOrder = async (req, res) => {
   try {
     const { items, amount, address } = req.body;
     const userId = req.userId;
-
-    if (!Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ success: false, message: "Items required" });
-    }
-    if (!address) {
-      return res.status(400).json({ success: false, message: "Address required" });
-    }
-    if (!Number.isFinite(Number(amount)) || Number(amount) <= 0) {
-      return res.status(400).json({ success: false, message: "Invalid amount" });
-    }
 
     const stockErrors = await deductStock(items);
     if (stockErrors.length > 0) {

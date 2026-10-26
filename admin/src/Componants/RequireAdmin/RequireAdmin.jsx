@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../AuthContext/AuthContext";
-import axios from "axios";
+import api from "../../api/axios";
 
 const RequireAdmin = ({ children }) => {
   const { isAuthenticated, user, token } = useAuth();
@@ -17,8 +17,7 @@ const RequireAdmin = ({ children }) => {
 
       setIsVerifying(true);
       try {
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/user/verify-token`);
+        const res = await api.get("/user/verify-token", { skipErrorToast: true });
         
         if (!res.data.success || !res.data.valid) {
           setIsValid(false);

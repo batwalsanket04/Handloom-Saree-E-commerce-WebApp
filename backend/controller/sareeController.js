@@ -15,22 +15,8 @@ export const addSaree = async (req, res) => {
   try {
     const { name, description, price, category, stock } = req.body;
 
-    if (!name || !price || !category) {
-      return handleError(res, 400, "Name, price, and category are required", false);
-    }
-
     if (!req.file) {
       return handleError(res, 400, "Image is required", false);
-    }
-
-    const numPrice = Number(price);
-    if (Number.isNaN(numPrice) || numPrice <= 0) {
-      return handleError(res, 400, "Price must be a positive number", false);
-    }
-
-    const numStock = stock === undefined || stock === "" ? 1000 : Number(stock);
-    if (!Number.isInteger(numStock) || numStock < 0) {
-      return handleError(res, 400, "Stock cannot be negative", false);
     }
 
     let imageField = null;
@@ -55,13 +41,13 @@ export const addSaree = async (req, res) => {
     }
 
     const saree = await sareeModel.create({
-      name: String(name).trim(),
-      description: description ? String(description).trim() : "No description provided",
-      price: numPrice,
-      category: String(category).trim(),
+      name,
+      description: description || "No description provided",
+      price,
+      category,
       image: imageField,
       imagePublicId,
-      stock: numStock,
+      stock: stock ?? 1000,
       sellerId: req.userId && Number.isInteger(Number(req.userId)) ? Number(req.userId) : null,
     });
 
@@ -199,26 +185,11 @@ export const updateSaree = async (req, res) => {
       return handleError(res, 403, "Unauthorized to update this saree", false);
     }
 
-    if (name) saree.name = String(name).trim();
-    if (description) saree.description = String(description).trim();
-
-    if (price !== undefined) {
-      const numPrice = Number(price);
-      if (Number.isNaN(numPrice) || numPrice <= 0) {
-        return handleError(res, 400, "Price must be a positive number", false);
-      }
-      saree.price = numPrice;
-    }
-
-    if (category) saree.category = String(category).trim();
-
-    if (stock !== undefined) {
-      const numStock = Number(stock);
-      if (!Number.isInteger(numStock) || numStock < 0) {
-        return handleError(res, 400, "Stock cannot be negative", false);
-      }
-      saree.stock = numStock;
-    }
+    if (name !== undefined) saree.name = name;
+    if (description !== undefined) saree.description = description;
+    if (price !== undefined) saree.price = price;
+    if (category !== undefined) saree.category = category;
+    if (stock !== undefined) saree.stock = stock;
 
     if (req.file) {
       try {

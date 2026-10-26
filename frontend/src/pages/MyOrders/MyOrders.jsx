@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../api/axios";
 import { context } from "../../Context/StoreContext";
 
 const MyOrders = () => {
-  const { url, token } = useContext(context);
+  const { token } = useContext(context);
   const [data, setData] = useState([]);
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get(`${url}/api/orders/userorders`);
+      const res = await api.get("/orders/userorders");
       setData(res.data.data || []);
     } catch (err) {
       console.error("Fetch orders error:", err);

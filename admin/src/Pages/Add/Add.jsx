@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Plus } from "lucide-react";
-import axios from "axios";
 import { toast } from "react-toastify";
+import api from "../../api/axios";
 
-const Add = ({ url = "http://localhost:4000" }) => {
+const Add = () => {
 
   const [formData, setFormData] = useState({
     Pname: "",
@@ -45,13 +45,7 @@ const Add = ({ url = "http://localhost:4000" }) => {
       payload.append("category", formData.category);
       if (formData.imageFile) payload.append("image", formData.imageFile);
 
-      const token = localStorage.getItem("token");
-      const response = await axios.post(`${url}/api/saree/add`, payload, {
-        headers: { 
-          "Content-Type": "multipart/form-data", 
-          "Authorization": `Bearer ${token}`
-        },
-      });
+      const response = await api.post("/saree/add", payload);
 
       if (response.data.success) {
         toast.success(response.data.message);
@@ -67,8 +61,7 @@ const Add = ({ url = "http://localhost:4000" }) => {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.message || "Server error");
+      console.error("Failed to add saree:", error);
     } finally {
       setLoading(false);
     }
