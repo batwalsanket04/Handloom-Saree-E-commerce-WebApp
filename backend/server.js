@@ -13,6 +13,9 @@ import orderRouter from "./routes/orderRoute.js";
 import contactRouter from "./routes/contactRoute.js";
 import healthRouter from "./routes/healthRoute.js";
 import apiLimiter from "./middlewere/rate.limiter.js";
+import loggerMiddleware from "./middlewere/loggerMiddleware.js";
+import logger from "./config/logger.js";
+import helmet from "helmet"
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -24,6 +27,9 @@ app.disable("x-powered-by");
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
+
+app.use(helmet())
+
 
 // CORS configuration
 app.use(
@@ -50,6 +56,7 @@ app.use(
 
 app.use(apiLimiter);
 console.log(apiLimiter)
+app.use(loggerMiddleware);
 
 
 console.log({
@@ -131,7 +138,10 @@ app.use((err, req, res, next) => {
   });
 });
 
+
+ 
+
 app.listen(port, () => {
-  console.log(`Server is up: http://localhost:${port}`);
+  logger.info(`Server is up: http://localhost:${port}`);
 });
 

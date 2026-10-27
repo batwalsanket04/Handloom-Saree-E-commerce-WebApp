@@ -71,10 +71,30 @@ const loginUser = async (req, res) => {
       },
     });
 
-  } catch (error) {
-    console.error("Login error:", error);
-    return handleError(res, 500, "Server error during login");
-  }
+  } catch(error){
+
+    logger.error({
+
+        message:"Login failed",
+
+        error:error.message,
+
+        stack:error.stack,
+
+        email:req.body.email,
+
+        ip:req.ip
+
+    });
+
+
+    return handleError(
+        res,
+        500,
+        "Server error during login"
+    );
+
+}
 };
 
 const adminLogin = async (req, res) => {

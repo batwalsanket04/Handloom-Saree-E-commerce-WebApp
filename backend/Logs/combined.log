@@ -1,0 +1,45 @@
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:24:56.731Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:26:00.915Z"}
+{"error":"Database failed","level":"error","message":"Testing error logger","timestamp":"2026-10-26T12:26:34.875Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:26:34.905Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:27:10.872Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"291ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-26T12:27:15.099Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"12ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-26T12:27:15.118Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:33:10.204Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:33:46.238Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:34:09.214Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:34:13.397Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:34:56.801Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:35:00.915Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"9ms","statusCode":401,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:35:35.872Z"}
+{"level":"info","message":{"ip":"::1","method":"POST","responseTime":"405ms","statusCode":401,"url":"/api/user/login"},"timestamp":"2026-10-26T12:37:16.531Z"}
+{"level":"info","message":{"ip":"::1","method":"POST","responseTime":"229ms","statusCode":200,"url":"/api/user/login"},"timestamp":"2026-10-26T12:37:22.565Z"}
+{"level":"info","message":{"ip":"::1","method":"POST","responseTime":"17ms","statusCode":200,"url":"/api/cart/get"},"timestamp":"2026-10-26T12:37:22.630Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"15ms","statusCode":304,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:37:22.636Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"49ms","statusCode":304,"url":"/api/wishlist"},"timestamp":"2026-10-26T12:37:22.675Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"1ms","statusCode":401,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:37:27.860Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"295ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:37:53.054Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:39:14.352Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"17ms","statusCode":500,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:39:17.791Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"4ms","statusCode":500,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:39:27.276Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:39:38.095Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:40:02.461Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"222ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:40:03.897Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"212ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:41:58.277Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:42:19.715Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"118ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:42:22.356Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"6ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:42:23.818Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"6ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:42:25.410Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"8ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:42:29.985Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"5ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:42:33.135Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"2ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:42:33.885Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-26T12:42:53.570Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"111ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:42:55.178Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"5ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:42:56.520Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"4ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:42:57.733Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"5ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:42:58.390Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"5ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:42:59.042Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"269ms","statusCode":200,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:43:31.545Z"}
+{"level":"info","message":{"ip":"::1","method":"POST","responseTime":"174ms","statusCode":200,"url":"/api/user/logout"},"timestamp":"2026-10-26T12:44:19.286Z"}
+{"level":"info","message":{"ip":"::1","method":"POST","responseTime":"406ms","statusCode":200,"url":"/api/user/login"},"timestamp":"2026-10-26T12:45:15.969Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"19ms","statusCode":304,"url":"/api/user/profile"},"timestamp":"2026-10-26T12:45:16.038Z"}
