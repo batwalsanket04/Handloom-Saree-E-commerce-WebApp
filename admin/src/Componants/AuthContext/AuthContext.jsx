@@ -13,13 +13,15 @@ export const useAuth = () => {
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [token, setToken] = useState(
+  () => localStorage.getItem("adminToken")
+);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
-      const storedToken = localStorage.getItem("token");
+      const storedToken = localStorage.getItem("adminToken");
 
       if (!storedToken) {
         setLoading(false);
@@ -39,7 +41,7 @@ const AuthProvider = ({ children }) => {
           setIsAuthenticated(true);
           localStorage.setItem("user", JSON.stringify(verifiedUser));
         } else {
-          localStorage.removeItem("token");
+          localStorage.removeItem("adminToken");
           localStorage.removeItem("user");
           setToken(null);
           setUser(null);
@@ -47,7 +49,7 @@ const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error("Token verification failed:", error);
-        localStorage.removeItem("token");
+     localStorage.removeItem("adminToken");
         localStorage.removeItem("user");
         setToken(null);
         setUser(null);

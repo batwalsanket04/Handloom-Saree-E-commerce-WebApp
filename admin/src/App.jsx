@@ -9,6 +9,7 @@ import Login from './Pages/Login/Login';
 import UserManagement from './Pages/UserManagement/UserManagement';
 import Dashboard from './Pages/Dashboard/Dashboard';
 import RequireAdmin from './Componants/RequireAdmin/RequireAdmin';
+import Category from './Pages/Category/Category';
 
 const AppContent = () => {
   const location = useLocation();
@@ -26,6 +27,8 @@ const AppContent = () => {
               <Route path="/add" element={<RequireAdmin><Add /></RequireAdmin>} />
               <Route path="/list" element={<RequireAdmin><List /></RequireAdmin>} />
               <Route path="/orders" element={<RequireAdmin><Orders /></RequireAdmin>} />
+              <Route path="/add-category" element={<RequireAdmin><Category/></RequireAdmin>} />
+
               <Route path="/users" element={<RequireAdmin><UserManagement /></RequireAdmin>} />
               <Route path="/dashboard" element={<RequireAdmin><Dashboard /></RequireAdmin>} />
               <Route path="/" element={<RequireAdmin><Dashboard /></RequireAdmin>} />

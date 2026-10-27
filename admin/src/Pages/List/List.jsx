@@ -87,7 +87,7 @@ const List = () => {
                 <p className="text-gray-500">{item.category}</p>
                 <p className="text-gray-700 font-semibold">₹{item.price}</p>
                 <button
-                  onClick={() => removeItem(item._id)}
+                  onClick={() => removeItem(item.id)}
                   className="text-pink-500 hover:text-red-700 p-2 rounded-full transition"
                 >
                   <FaTrash className="w-5 h-5" />

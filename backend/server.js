@@ -16,7 +16,7 @@ import apiLimiter from "./middlewere/rate.limiter.js";
 import loggerMiddleware from "./middlewere/loggerMiddleware.js";
 import logger from "./config/logger.js";
 import helmet from "helmet"
-
+ import categoryRoutes from "./Cms/Category/categoryRoutes.js"
 const app = express();
 const port = process.env.PORT || 4000;
 
@@ -59,6 +59,7 @@ console.log(apiLimiter)
 app.use(loggerMiddleware);
 
 
+
 console.log({
  DB_USERNAME: process.env.DB_USERNAME,
  DB_USER: process.env.DB_USER,
@@ -94,6 +95,11 @@ app.use("/api/wishlist", wishlistRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/contact", contactRouter);
 app.use("/api/health", healthRouter);
+app.use(
+"/api/category",
+categoryRoutes
+);
+ 
 
 // Health check
 app.get("/", (req, res) => {
