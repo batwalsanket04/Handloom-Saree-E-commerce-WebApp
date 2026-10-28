@@ -3,37 +3,39 @@ import sareeModel from "../models/sareeModel.js";
 import RefreshToken from "../models/refreshtoken.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { createAccessToken, createRefreshToken } from "../Utils/token.js";
+import { generateAndStoreTokens, clearAuthCookies } from "../Utils/redisAuth.js";
 
 const isValidId = (id) => Number.isSafeInteger(Number(id)) && Number(id) > 0;
 
-const createToken = (id, role = "user") => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
-};
-
-const createRefreshToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
-};
-
-const saveRefreshToken = async (user, res) => {
-  const token = createRefreshToken(user.id);
-  const maxAge = 7 * 24 * 60 * 60 * 1000;
-
-  await RefreshToken.create({
-    userId: user.id,
-    token,
-    expiresAt: new Date(Date.now() + maxAge),
-  });
-
-  res.cookie("refreshToken", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge,
-  });
-};
-
 const handleError = (res, status, message) => {
   return res.status(status).json({ success: false, message });
+};
+
+// Ensure admin user exists in database
+const ensureAdminUser = async () => {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  
+  if (!adminEmail || !adminPassword) {
+    return null;
+  }
+  
+  let adminUser = await userModel.findOne({ where: { email: adminEmail.toLowerCase() } });
+  
+  if (!adminUser) {
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    adminUser = await userModel.create({
+      name: "Admin",
+      email: adminEmail.toLowerCase(),
+      password: hashedPassword,
+      role: "admin"
+    });
+  } else if (adminUser.role !== "admin") {
+    adminUser = await adminUser.update({ role: "admin" });
+  }
+  
+  return adminUser;
 };
 
 const loginUser = async (req, res) => {
@@ -56,9 +58,8 @@ const loginUser = async (req, res) => {
       return handleError(res, 401, "Invalid credentials");
     }
 
-    const accessToken = createToken(user.id, user.role);
-
-    await saveRefreshToken(user, res);
+    // Generate tokens and store refresh token in Redis + PostgreSQL
+    const { accessToken } = await generateAndStoreTokens(user, res);
 
     return res.json({
       success: true,
@@ -73,20 +74,7 @@ const loginUser = async (req, res) => {
 
   } catch(error){
 
-    logger.error({
-
-        message:"Login failed",
-
-        error:error.message,
-
-        stack:error.stack,
-
-        email:req.body.email,
-
-        ip:req.ip
-
-    });
-
+    console.error("Login failed:", error);
 
     return handleError(
         res,
@@ -101,16 +89,30 @@ const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Ensure admin user exists in DB
+    const adminUser = await ensureAdminUser();
+    
+    if (!adminUser) {
+      return handleError(res, 500, "Admin not configured");
+    }
+
+    // Verify credentials against env (not DB password, for security)
     if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
       return handleError(res, 401, "Invalid admin credentials");
     }
 
-    const token = createToken("admin", "admin");
+    // Generate tokens and store refresh token in Redis + PostgreSQL
+    const { accessToken } = await generateAndStoreTokens(adminUser, res);
+
     return res.json({
       success: true,
-      token,
-      accessToken: token,
-      user: { id: "admin", _id: "admin", name: "Admin", email, role: "admin" },
+      accessToken,
+      user: {
+        id: adminUser.id,
+        name: adminUser.name,
+        email: adminUser.email,
+        role: adminUser.role
+      },
     });
   } catch (error) {
     console.error("Admin login error:", error);
@@ -131,11 +133,9 @@ password
 }=req.body;
 
 
-
 const normalizedEmail=email
 ?.trim()
 .toLowerCase();
-
 
 
 const existingUser =
@@ -157,10 +157,8 @@ res,
 }
 
 
-
 const hashedPassword =
 await bcrypt.hash(password,10);
-
 
 
 const user =
@@ -179,16 +177,8 @@ role:"user"
 });
 
 
-
-const token=createToken(
-user.id,
-user.role
-);
-
-
-
-await saveRefreshToken(user,res);
-
+// Generate tokens and store refresh token in Redis + PostgreSQL
+const { accessToken } = await generateAndStoreTokens(user, res);
 
 
 return res.status(201).json({
@@ -223,13 +213,6 @@ res,
 }
 const getProfile = async (req, res) => {
   try {
-    if (req.userId === "admin" && req.userRole === "admin") {
-      return res.json({
-        success: true,
-        user: { id: "admin", _id: "admin", name: "Admin", email: process.env.ADMIN_EMAIL, role: "admin" },
-      });
-    }
-
     const user = await userModel.findByPk(req.userId, {
       attributes: { exclude: ["password"] },
     });
@@ -247,14 +230,6 @@ const getProfile = async (req, res) => {
 
 const verifyToken = async (req, res) => {
   try {
-    if (req.userId === "admin" && req.userRole === "admin") {
-      return res.json({
-        success: true,
-        valid: true,
-        user: { id: "admin", _id: "admin", name: "Admin", email: process.env.ADMIN_EMAIL, role: "admin" },
-      });
-    }
-
     const user = await userModel.findByPk(req.userId, {
       attributes: { exclude: ["password"] },
     });

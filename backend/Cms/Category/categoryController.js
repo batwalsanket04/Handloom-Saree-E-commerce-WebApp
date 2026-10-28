@@ -1,8 +1,9 @@
 import Category from "./categoryModel.js";
 import cloudinary from "../../config/cloudinary.js";
+import fs from "fs";
+import { cmsCache } from "../../config/redis.js";
 
 // CREATE
-
 export const createCategory = async(req,res)=>{
 
 try{
@@ -33,7 +34,6 @@ const uploadRes = await cloudinary.uploader.upload(
 );
 
 
-
 const category = await Category.create({
 
 name,
@@ -44,6 +44,8 @@ imagePublicId:uploadRes.public_id
 
 });
 
+// Invalidate cache after creation
+await cmsCache.invalidate("categories");
 
 
 return res.json({
@@ -75,13 +77,20 @@ message:error.message
 };
 
 
-
-
 // GET ALL
-
 export const getCategories=async(req,res)=>{
 
 try{
+  // Try to get from Redis cache first
+  const cachedCategories = await cmsCache.get("categories");
+  if (cachedCategories) {
+    console.log("Serving Categories from Redis cache");
+    return res.json({
+      success: true,
+      categories: cachedCategories,
+      cached: true,
+    });
+  }
 
 const categories=await Category.findAll({
 
@@ -91,10 +100,14 @@ status:true
 
 });
 
+// Cache in Redis for 1 hour
+await cmsCache.set("categories", categories, 3600);
+
 
 res.json({
 success:true,
-categories
+categories,
+cached: false
 });
 
 
@@ -110,10 +123,7 @@ message:error.message
 };
 
 
-
-
 // DELETE
-
 export const deleteCategory = async(req,res)=>{
 
 try{
@@ -136,6 +146,9 @@ message:"Category not found"
 
 await category.destroy();
 
+// Invalidate cache after deletion
+await cmsCache.invalidate("categories");
+
 
 res.json({
 
@@ -148,18 +161,16 @@ message:"Category deleted"
 }catch(error){
 
 res.status(500).json({
-
 success:false,
 message:error.message
-
 });
 
 }
 
 };
 
-// UPDATE CATEGORY
 
+// UPDATE CATEGORY
 export const updateCategory = async(req,res)=>{
 
 try{
@@ -180,16 +191,36 @@ message:"Category not found"
 
 }
 
+let image = category.image;
+let imagePublicId = category.imagePublicId;
+
+if (req.file) {
+  if (category.imagePublicId) {
+    await cloudinary.uploader.destroy(category.imagePublicId);
+  }
+
+  const result = await cloudinary.uploader.upload(req.file.path, {
+    folder: "handloom_categories",
+    resource_type: "auto"
+  });
+
+  image = result.secure_url;
+  imagePublicId = result.public_id;
+
+  fs.unlinkSync(req.file.path);
+}
+
 
 await category.update({
 
 name:name || category.name,
-
-image:req.file 
-? req.file.path 
-: category.image
+image,
+imagePublicId
 
 });
+
+// Invalidate cache after update
+await cmsCache.invalidate("categories");
 
 
 res.json({

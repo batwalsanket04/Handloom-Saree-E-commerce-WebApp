@@ -394,3 +394,56 @@
 {"level":"info","message":{"ip":"::1","method":"GET","responseTime":"3ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-27T11:36:53.282Z"}
 {"level":"info","message":{"ip":"::1","method":"GET","responseTime":"5ms","statusCode":304,"url":"/api/category/list"},"timestamp":"2026-10-27T11:36:55.785Z"}
 {"level":"info","message":{"ip":"::1","method":"GET","responseTime":"1ms","statusCode":304,"url":"/api/category/list"},"timestamp":"2026-10-27T11:36:55.787Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-28T10:49:24.150Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"282ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T10:49:57.134Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"13ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T10:49:57.152Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"5ms","statusCode":404,"url":"/api/about"},"timestamp":"2026-10-28T10:50:15.833Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"3ms","statusCode":404,"url":"/api/about"},"timestamp":"2026-10-28T10:50:15.843Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"143ms","statusCode":304,"url":"/api/category/list"},"timestamp":"2026-10-28T10:50:33.461Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"4ms","statusCode":304,"url":"/api/category/list"},"timestamp":"2026-10-28T10:50:33.468Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"237ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T10:50:33.551Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"9ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T10:50:33.561Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-28T11:12:12.164Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-28T11:15:26.220Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-28T11:16:27.593Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-28T11:16:51.284Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-28T12:07:48.451Z"}
+{"level":"info","message":"Server is up: http://localhost:4000","timestamp":"2026-10-28T12:11:21.080Z"}
+{"level":"info","message":{"ip":"::1","method":"POST","responseTime":"551ms","statusCode":200,"url":"/api/user/admin-login"},"timestamp":"2026-10-28T12:11:35.496Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"93ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:11:35.746Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"12ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:11:35.763Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"198ms","statusCode":200,"url":"/api/category/list"},"timestamp":"2026-10-28T12:11:38.669Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"82ms","statusCode":200,"url":"/api/category/list"},"timestamp":"2026-10-28T12:11:38.760Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"2ms","statusCode":401,"url":"/api/orders/list"},"timestamp":"2026-10-28T12:11:40.981Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"1ms","statusCode":401,"url":"/api/orders/list"},"timestamp":"2026-10-28T12:11:40.986Z"}
+{"level":"info","message":{"ip":"::1","method":"POST","responseTime":"216ms","statusCode":200,"url":"/api/user/refresh-token"},"timestamp":"2026-10-28T12:11:41.218Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"167ms","statusCode":304,"url":"/api/orders/list"},"timestamp":"2026-10-28T12:11:41.409Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"86ms","statusCode":304,"url":"/api/orders/list"},"timestamp":"2026-10-28T12:11:41.497Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"67ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:11:43.557Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"8ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:11:43.567Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"17ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:11:46.319Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"18ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:11:46.342Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"47ms","statusCode":304,"url":"/api/orders/list"},"timestamp":"2026-10-28T12:11:47.404Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"50ms","statusCode":304,"url":"/api/orders/list"},"timestamp":"2026-10-28T12:11:47.458Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"32ms","statusCode":304,"url":"/api/category/list"},"timestamp":"2026-10-28T12:11:48.271Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"30ms","statusCode":304,"url":"/api/category/list"},"timestamp":"2026-10-28T12:11:48.306Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"16ms","statusCode":304,"url":"/api/category/list"},"timestamp":"2026-10-28T12:12:51.827Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"18ms","statusCode":304,"url":"/api/category/list"},"timestamp":"2026-10-28T12:12:51.847Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"242ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:12:52.056Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"8ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:12:52.065Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"277ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:13:21.404Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"7ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:13:21.413Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"6ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:13:25.591Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"6ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:13:25.599Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"233ms","statusCode":401,"url":"/api/user/verify-token"},"timestamp":"2026-10-28T12:14:22.285Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"260ms","statusCode":401,"url":"/api/user/verify-token"},"timestamp":"2026-10-28T12:14:22.551Z"}
+{"level":"info","message":{"ip":"::1","method":"POST","responseTime":"1263ms","statusCode":200,"url":"/api/user/refresh-token"},"timestamp":"2026-10-28T12:14:23.575Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"596ms","statusCode":304,"url":"/api/user/verify-token"},"timestamp":"2026-10-28T12:14:24.269Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"267ms","statusCode":304,"url":"/api/user/verify-token"},"timestamp":"2026-10-28T12:14:24.538Z"}
+{"level":"info","message":{"ip":"::1","method":"POST","responseTime":"232ms","statusCode":200,"url":"/api/user/admin-login"},"timestamp":"2026-10-28T12:14:32.740Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"45ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:14:32.933Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"41ms","statusCode":304,"url":"/api/saree/list"},"timestamp":"2026-10-28T12:14:32.980Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"121ms","statusCode":304,"url":"/api/user/verify-token"},"timestamp":"2026-10-28T12:14:35.934Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"42ms","statusCode":304,"url":"/api/user/verify-token"},"timestamp":"2026-10-28T12:14:35.978Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"31ms","statusCode":304,"url":"/api/user/verify-token"},"timestamp":"2026-10-28T12:14:39.398Z"}
+{"level":"info","message":{"ip":"::1","method":"GET","responseTime":"30ms","statusCode":304,"url":"/api/user/verify-token"},"timestamp":"2026-10-28T12:14:39.431Z"}

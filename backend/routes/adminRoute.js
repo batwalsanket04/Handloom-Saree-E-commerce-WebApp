@@ -1,53 +1,29 @@
 import express from "express";
-
+import { adminAuth } from "../middlewere/rbac.js";
 import {
-authMiddleware,
-authorizeRole
-}
-from "../middlewere/auth.js";
+  getAllUsers,
+  deleteUser,
+  updateUserRole
+} from "../controller/userController.js";
 
+const adminRouter = express.Router();
 
-import {
-getAllUsers,
-deleteUser,
-updateUserRole
-}
-from "../controller/userController.js";
-
-
-const adminRouter=express.Router();
-
-
-
-adminRouter.use(
-authMiddleware,
-authorizeRole(
-"admin",
-"super_admin"
-)
-);
-
-
+// All admin routes require authentication + admin role
+adminRouter.use(...adminAuth);
 
 adminRouter.get(
-"/users",
-getAllUsers
+  "/users",
+  getAllUsers
 );
-
-
 
 adminRouter.delete(
-"/users/:userId",
-deleteUser
+  "/users/:userId",
+  deleteUser
 );
-
-
 
 adminRouter.put(
-"/users/:userId/role",
-updateUserRole
+  "/users/:userId/role",
+  updateUserRole
 );
-
-
 
 export default adminRouter;

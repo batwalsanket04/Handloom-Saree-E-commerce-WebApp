@@ -45,8 +45,9 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Request interceptor - attach access token from localStorage
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("adminToken");
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -55,9 +56,79 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Response interceptor - handle token refresh on 401
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+
+    // If error is 401 and we haven't tried to refresh yet
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      // Skip refresh for auth endpoints to avoid infinite loops
+      if (originalRequest.url?.includes("/user/login") || 
+          originalRequest.url?.includes("/user/admin-login") ||
+          originalRequest.url?.includes("/user/refresh-token") ||
+          originalRequest.url?.includes("/user/logout")) {
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        // Wait for the ongoing refresh to complete
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        // Call refresh token endpoint (uses httpOnly cookie)
+        const response = await api.post("/user/refresh-token", {}, { skipErrorToast: true });
+        
+        if (response.data?.success && response.data?.accessToken) {
+          const newAccessToken = response.data.accessToken;
+          localStorage.setItem("adminToken", newAccessToken);
+          
+          // Process any queued requests
+          processQueue(null, newAccessToken);
+          
+          // Retry original request with new token
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        
+        // Refresh failed - clear auth and redirect to login
+        localStorage.removeItem("adminToken");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
     if (!error.config?.skipErrorToast) {
       showApiError(error);
     }

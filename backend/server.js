@@ -16,7 +16,8 @@ import apiLimiter from "./middlewere/rate.limiter.js";
 import loggerMiddleware from "./middlewere/loggerMiddleware.js";
 import logger from "./config/logger.js";
 import helmet from "helmet"
- import categoryRoutes from "./Cms/Category/categoryRoutes.js"
+import categoryRoutes from "./Cms/Category/categoryRoutes.js"
+import adminRouter from "./routes/adminRoute.js"
 const app = express();
 const port = process.env.PORT || 4000;
 
@@ -99,6 +100,7 @@ app.use(
 "/api/category",
 categoryRoutes
 );
+app.use("/api/admin", adminRouter);
  
 
 // Health check

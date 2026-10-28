@@ -3,6 +3,7 @@ import RefreshToken from "../models/refreshtoken.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validator from "validator";
+import { validateRefreshToken, generateAndStoreTokens, blacklistAccessToken, clearAuthCookies, revokeAllUserRefreshTokens, cacheUser } from "../Utils/redisAuth.js";
 
 
 // Generate Access Token
@@ -38,7 +39,6 @@ const createRefreshToken = (user)=>{
 };
 
 
-
 const handleError=(res,status,message)=>{
 
 return res.status(status).json({
@@ -64,7 +64,6 @@ const {
 }=req.body;
 
 
-
 if(!name || !email || !password){
 
 return handleError(
@@ -74,7 +73,6 @@ return handleError(
 );
 
 }
-
 
 
 if(!validator.isEmail(email)){
@@ -88,7 +86,6 @@ return handleError(
 }
 
 
-
 const exists = await User.findOne({
 
 where:{
@@ -96,7 +93,6 @@ where:{
 }
 
 });
-
 
 
 if(exists){
@@ -110,12 +106,10 @@ return handleError(
 }
 
 
-
 const hashPassword = await bcrypt.hash(
     password,
     10
 );
-
 
 
 const user = await User.create({
@@ -130,10 +124,8 @@ role:"user"
 
 });
 
-
-
-const accessToken=createAccessToken(user);
-
+// Generate tokens and store refresh token in Redis + PostgreSQL
+const { accessToken } = await generateAndStoreTokens(user, res);
 
 
 res.status(201).json({
@@ -156,7 +148,6 @@ user:{
 });
 
 
-
 }
 catch(error){
 
@@ -166,7 +157,6 @@ next(error);
 
 
 };
-
 
 
  
@@ -182,7 +172,6 @@ password
 }=req.body;
 
 
-
 const user = await User.findOne({
 
 where:{
@@ -190,7 +179,6 @@ where:{
 }
 
 });
-
 
 
 if(!user){
@@ -204,12 +192,10 @@ return handleError(
 }
 
 
-
 const match = await bcrypt.compare(
     password,
     user.password
 );
-
 
 
 if(!match){
@@ -223,43 +209,8 @@ return handleError(
 }
 
 
-
-const accessToken=createAccessToken(user);
-
-const refreshToken=createRefreshToken(user);
-
-
-
-// save refresh token
-
-await RefreshToken.create({
-
-userId:user.id,
-
-token:refreshToken,
-
-expiresAt:new Date(
-Date.now()+7*24*60*60*1000
-)
-
-});
-
-
-
-// cookie
-
-res.cookie(
-"refreshToken",
-refreshToken,
-{
-httpOnly:true,
-secure:false,
-sameSite:"lax",
-maxAge:7*24*60*60*1000
-}
-
-);
-
+// Generate tokens and store refresh token in Redis + PostgreSQL
+const { accessToken } = await generateAndStoreTokens(user, res);
 
 
 res.json({
@@ -278,7 +229,6 @@ role:user.role
 
 });
 
-
 }
 catch(error){
 
@@ -289,15 +239,10 @@ next(error);
 
 };
 
-
-
-
-
 // ================= REFRESH TOKEN =================
 
 
 const refreshToken = async(req,res,next)=>{
-
 
 try{
 
@@ -316,58 +261,21 @@ res,
 }
 
 
+// Use Redis-integrated validation (checks Redis cache first, falls back to PostgreSQL)
+const { user, isValid, isRevoked, reason } = await validateRefreshToken(token);
 
-const storedToken =
-await RefreshToken.findOne({
-
-where:{
-token,
-revoked:false
-}
-
-});
-
-
-
-if(!storedToken){
+if(!isValid || !user){
 
 return handleError(
 res,
 403,
-"Invalid refresh token"
+reason || "Invalid refresh token"
 );
 
 }
 
 
-
-const decoded = jwt.verify(
-token,
-process.env.JWT_REFRESH_SECRET
-);
-
-
-
-const user =
-await User.findByPk(decoded.id);
-
-
-
-if(!user){
-
-return handleError(
-res,
-404,
-"User not found"
-);
-
-}
-
-
-
-const accessToken =
-createAccessToken(user);
-
+const accessToken = createAccessToken(user);
 
 
 res.json({
@@ -375,9 +283,8 @@ res.json({
 success:true,
 accessToken
 
+
 });
-
-
 
 }
 catch(error){
@@ -388,9 +295,6 @@ next(error);
 
 
 };
-
-
-
 
 
 // ================= LOGOUT =================
@@ -404,23 +308,29 @@ try{
 const token=req.cookies.refreshToken;
 
 
-
 if(token){
 
+// Revoke in PostgreSQL
 await RefreshToken.destroy({
-
 where:{
 token
 }
-
 });
 
+// Remove from Redis cache
+await tokenCache.delRefreshToken(token);
 }
 
+// Blacklist the access token if present
+const authHeader = req.headers.authorization;
+if (authHeader) {
+    const accessToken = authHeader.split(" ")[1];
+    if (accessToken) {
+        await blacklistAccessToken(accessToken);
+    }
+}
 
-
-res.clearCookie("refreshToken");
-
+clearAuthCookies(res);
 
 
 res.json({
@@ -428,8 +338,8 @@ res.json({
 success:true,
 message:"Logout successful"
 
-});
 
+});
 
 }
 catch(error){
@@ -442,19 +352,15 @@ next(error);
 };
 
 
-
-
 // ================= PROFILE =================
 
 
 const getProfile = async(req,res,next)=>{
 
-
 try{
 
 
-const user =
-await User.findByPk(
+const user = await User.findByPk(
 req.userId,
 {
 attributes:{
@@ -462,7 +368,6 @@ exclude:["password"]
 }
 }
 );
-
 
 
 if(!user){
@@ -476,14 +381,13 @@ res,
 }
 
 
-
 res.json({
 
 success:true,
 user
 
-});
 
+});
 
 }
 catch(error){
@@ -494,8 +398,6 @@ next(error);
 
 
 };
-
-
 
 
 export {

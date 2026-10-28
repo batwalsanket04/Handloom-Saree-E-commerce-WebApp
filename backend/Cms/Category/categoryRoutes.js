@@ -1,51 +1,42 @@
 import express from "express";
-
 import {
-createCategory,
-getCategories,
-deleteCategory,
-updateCategory
-}
-from "./categoryController.js";
-import authMiddleware from "../../middlewere/auth.js";
-import allowRoles from "../../middlewere/role.middleware.js"
+  createCategory,
+  getCategories,
+  deleteCategory,
+  updateCategory
+} from "./categoryController.js";
+import { adminAuth } from "../../middlewere/rbac.js";
 import upload from "../../uploads/Upload.js";
- 
 
+const router = express.Router();
 
-const router=express.Router();
-
-
-
+// Admin only - create category
 router.post(
   "/create",
- authMiddleware,
-  allowRoles("admin"),
+  ...adminAuth,
   upload.single("image"),
   createCategory
 );
 
-
-
+// Public - list categories
 router.get(
-"/list",
-getCategories
+  "/list",
+  getCategories
 );
 
-
-
+// Admin only - delete category
 router.delete(
-"/:id",
-deleteCategory
+  "/:id",
+  ...adminAuth,
+  deleteCategory
 );
- 
 
+// Admin only - update category
 router.put(
-"/update/:id",
-upload.single("image"),
-updateCategory
+  "/update/:id",
+  ...adminAuth,
+  upload.single("image"),
+  updateCategory
 );
-
-
 
 export default router;
