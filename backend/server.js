@@ -11,12 +11,14 @@ import "dotenv/config";
 import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import contactRouter from "./routes/contactRoute.js";
+import aboutRouter from "./Cms/About/aboutRoute.js";
 import healthRouter from "./routes/healthRoute.js";
 import apiLimiter from "./middlewere/rate.limiter.js";
 import loggerMiddleware from "./middlewere/loggerMiddleware.js";
 import logger from "./config/logger.js";
 import helmet from "helmet"
- import categoryRoutes from "./Cms/Category/categoryRoutes.js"
+import categoryRoutes from "./Cms/Category/categoryRoutes.js"
+import adminRouter from "./routes/adminRoute.js"
 const app = express();
 const port = process.env.PORT || 4000;
 
@@ -99,6 +101,8 @@ app.use(
 "/api/category",
 categoryRoutes
 );
+app.use("/api/admin", adminRouter);
+app.use("/api/about", aboutRouter);
  
 
 // Health check

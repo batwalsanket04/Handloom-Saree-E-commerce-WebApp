@@ -34,7 +34,14 @@ const Sidebar = () => {
         className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-300 hover:border-pink-500 hover:bg-pink-50 cursor-pointer transition"
       >
         <ShoppingCart className="w-6 h-6 text-pink-600" />
-        <p className="text-gray-700 font-medium">Edit Category</p>
+        <p className="text-gray-700 font-medium">Manage Category</p>
+      </NavLink>
+      <NavLink
+        to="/edit-about"
+        className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-300 hover:border-pink-500 hover:bg-pink-50 cursor-pointer transition"
+      >
+        <ShoppingCart className="w-6 h-6 text-pink-600" />
+        <p className="text-gray-700 font-medium">manage About</p>
       </NavLink>
     </aside>
   );

@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
+import { isTokenBlacklisted } from "../Utils/redisAuth.js";
 
 /**
  * Auth Middleware - Validates JWT token and extracts user info
@@ -26,6 +27,15 @@ const authMiddleware = async (req, res, next) => {
     }
 
     const token = tokenParts[1];
+
+    // Check if token is blacklisted (logged out)
+    const blacklisted = await isTokenBlacklisted(token);
+    if (blacklisted) {
+      return res.status(401).json({
+        success: false,
+        message: "Token has been revoked",
+      });
+    }
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);

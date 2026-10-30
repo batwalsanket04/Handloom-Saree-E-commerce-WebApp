@@ -1,5 +1,5 @@
 import express from "express";
-import authMiddleware, { authorizeAdmin } from "../middlewere/auth.js";
+import { userAuth, adminAuth } from "../middlewere/rbac.js";
 import { 
   placeOrder, 
   verifyOrder, 
@@ -19,19 +19,19 @@ import {
 
 const orderRouter = express.Router();
 
-// Place orders
-orderRouter.post("/place", authMiddleware, validate(placeOrderSchema), placeOrder);
-orderRouter.post("/cod", authMiddleware, validate(placeCodOrderSchema), placeCodOrder);
+// Place orders (authenticated users)
+orderRouter.post("/place", ...userAuth, validate(placeOrderSchema), placeOrder);
+orderRouter.post("/cod", ...userAuth, validate(placeCodOrderSchema), placeCodOrder);
 
-// Verify payment
-orderRouter.post("/verify", authMiddleware, validate(verifyOrderSchema), verifyOrder);
+// Verify payment (authenticated users)
+orderRouter.post("/verify", ...userAuth, validate(verifyOrderSchema), verifyOrder);
 
-// Get user's orders
-orderRouter.get("/userorders", authMiddleware, userOrder);
+// Get user's orders (authenticated users)
+orderRouter.get("/userorders", ...userAuth, userOrder);
 
 // Admin routes - List and manage orders
-orderRouter.get("/list", authMiddleware, authorizeAdmin, listOrders);
-orderRouter.post("/update/:orderId", authMiddleware, authorizeAdmin, validate(updateOrderStatusSchema), updateOrderStatus);
-orderRouter.delete("/:orderId", authMiddleware, authorizeAdmin, deleteOrder);
+orderRouter.get("/list", ...adminAuth, listOrders);
+orderRouter.post("/update/:orderId", ...adminAuth, validate(updateOrderStatusSchema), updateOrderStatus);
+orderRouter.delete("/:orderId", ...adminAuth, deleteOrder);
 
 export default orderRouter;
