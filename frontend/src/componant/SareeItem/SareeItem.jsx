@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { context } from "../../Context/StoreContext";
 import { FaPlus, FaMinus, FaStar, FaStarHalfAlt, FaHeart, FaRegHeart } from "react-icons/fa";
 
-const SareeItem = ({ _id, name, price, description, image }) => {
+const SareeItem = ({ id, _id, name, price, description, image }) => {
   const { cartItem, addToCart, removeFromCart, url, isInWishlist, addToWishlist, removeFromWishlist } = useContext(context);
 
  useEffect(() => {
@@ -29,10 +29,10 @@ const SareeItem = ({ _id, name, price, description, image }) => {
 
 
 
-        {!cartItem[_id] ? (
+        {!cartItem[id] ? (
           <button
             className="absolute bottom-2 right-2 bg-white text-gray-500 p-2 rounded-full shadow-md hover:bg-gray-200 transition"
-            onClick={() => addToCart(_id)}
+            onClick={() => addToCart(id)}
           >
             <FaPlus />
           </button>
@@ -40,14 +40,14 @@ const SareeItem = ({ _id, name, price, description, image }) => {
           <div className="absolute bottom-2 right-2 bg-white rounded-full shadow-md flex items-center gap-3 px-3 py-1">
             <button
               className="text-red-500 hover:text-red-700"
-              onClick={() => removeFromCart(_id)}
+              onClick={() => removeFromCart(id)}
             >
               <FaMinus />
             </button>
-            <p>{cartItem[_id]}</p>
+            <p>{cartItem[id]}</p>
             <button
               className="text-green-500 hover:text-green-700"
-              onClick={() => addToCart(_id)}
+              onClick={() => addToCart(id)}
             >
               <FaPlus />
             </button>
@@ -56,9 +56,9 @@ const SareeItem = ({ _id, name, price, description, image }) => {
         {/* Wishlist button top-left */}
         <button
           className="absolute top-2 left-2 bg-white rounded-full p-2 shadow-md"
-          onClick={() => (isInWishlist(_id) ? removeFromWishlist(_id) : addToWishlist(_id))}
+          onClick={() => (isInWishlist(id) ? removeFromWishlist(id) : addToWishlist(id))}
         >
-          {isInWishlist(_id) ? (
+          {isInWishlist(id) ? (
             <FaHeart className="text-pink-600" />
           ) : (
             <FaRegHeart className="text-gray-400" />

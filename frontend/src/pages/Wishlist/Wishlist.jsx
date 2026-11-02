@@ -12,8 +12,9 @@ const Wishlist = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {wishlist.map((s) => (
             <SareeItem
-              key={s._id || s}
-              _id={s._id || s}
+              key={s._id || s.id || s}
+              id={s._id || s.id || s}
+              _id={s._id || s.id || s}
               name={s.name}
               price={s.price}
               description={s.description}

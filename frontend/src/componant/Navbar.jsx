@@ -3,7 +3,8 @@ import React, { useContext, useState } from "react";
 import { Menu, X, ShoppingCart, Search } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { context } from "../Context/StoreContext";
-import { FaUserCircle, FaSignOutAlt, FaBoxOpen, FaHeart } from "react-icons/fa";
+import { FaSignOutAlt, FaBoxOpen, FaHeart, FaUserCircle } from "react-icons/fa";
+import UserSidebar from "./UserSidebar";
 
 const Navbar = ({ setShowLogine }) => {
   const nav = useNavigate();
@@ -18,7 +19,7 @@ const Navbar = ({ setShowLogine }) => {
   } = useContext(context);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
 
   const totalItem = Object.values(cartItem).reduce(
@@ -36,7 +37,8 @@ const Navbar = ({ setShowLogine }) => {
   };
 
   return (
-    <nav className="bg-white shadow-md fixed w-full top-0 left-0 z-50">
+    <>
+      <nav className="bg-white shadow-md fixed w-full top-0 left-0 z-50">
       {/* MAIN BAR */}
       <div className="max-w-screen-xl mx-auto flex justify-between items-center px-6 py-4">
         <h1
@@ -92,31 +94,13 @@ const Navbar = ({ setShowLogine }) => {
             </button>
           ) : (
             <div
-              className="hidden md:flex items-center gap-2 relative cursor-pointer"
-              onMouseEnter={() => setShowDropdown(true)}
-              onMouseLeave={() => setShowDropdown(false)}
+              className="hidden md:flex items-center gap-2 cursor-pointer"
+              onClick={() => setShowSidebar(true)}
             >
               <span className="text-gray-700 font-medium">
                 Hi, {user?.name || "User"}
               </span>
               <FaUserCircle size={28} className="text-pink-600" />
-
-              {showDropdown && (
-                <div className="absolute right-0 top-10 w-44 bg-white border shadow-lg rounded-xl">
-                  <button
-                    onClick={() => nav("/myorders")}
-                    className="w-full px-4 py-3 flex gap-2 hover:bg-pink-50"
-                  >
-                    <FaBoxOpen /> My Orders
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full px-4 py-3 flex gap-2 text-red-600 hover:bg-red-50"
-                  >
-                    <FaSignOutAlt /> Logout
-                  </button>
-                </div>
-              )}
             </div>
           )}
 
@@ -173,6 +157,13 @@ const Navbar = ({ setShowLogine }) => {
         </div>
       )}
     </nav>
+
+      <UserSidebar
+        setShowLogine={setShowLogine}
+        isOpen={showSidebar}
+        setIsOpen={setShowSidebar}
+      />
+    </>
   );
 };
 

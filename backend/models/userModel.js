@@ -50,6 +50,11 @@ const User = sequelize.define(
       type: DataTypes.TEXT,
       defaultValue: "",
     },
+
+    paymentMethods: {
+      type: DataTypes.TEXT,
+      defaultValue: "[]",
+    },
   },
   {
     tableName: "users",

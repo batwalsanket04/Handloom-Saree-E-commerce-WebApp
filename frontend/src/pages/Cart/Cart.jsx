@@ -16,7 +16,7 @@ const Cart = () => {
       ? []
       : Object.keys(cartItem)
           .map((id) => {
-            const product = sarees.find((s) => s._id === id);
+            const product = sarees.find((s) => String(s.id) === id || String(s._id) === id);
             return product ? { ...product, quantity: cartItem[id] } : null;
           })
           .filter(Boolean);
@@ -47,7 +47,7 @@ const Cart = () => {
               const itemTotal = val.price * val.quantity;
               return (
                 <div
-                  key={val._id}
+                  key={val.id}
                   className="grid grid-cols-6 gap-4 items-center py-4 hover:bg-pink-50 rounded-lg transition duration-200"
                 >
                   <img
@@ -60,14 +60,14 @@ const Cart = () => {
 
                   <div className="flex items-center gap-2 text-gray-700 font-semibold">
                     <button
-                      onClick={() => removeFromCart(val._id)}
+                      onClick={() => removeFromCart(val.id)}
                       className="px-2 bg-pink-200 rounded"
                     >
                       -
                     </button>
                     <span>{val.quantity}</span>
                     <button
-                      onClick={() => addToCart(val._id)}
+                      onClick={() => addToCart(val.id)}
                       className="px-2 bg-pink-200 rounded"
                     >
                       +
@@ -77,7 +77,7 @@ const Cart = () => {
                   <p className="text-gray-800 font-semibold">₹{itemTotal}</p>
                   <button
                     className="text-pink-600 font-bold hover:text-pink-800 transition"
-                    onClick={() => removeFromCart(val._id)}
+                    onClick={() => removeFromCart(val.id)}
                   >
                     <FaTrash />
                   </button>

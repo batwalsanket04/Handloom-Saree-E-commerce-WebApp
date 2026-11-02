@@ -17,9 +17,10 @@ const SareeDisplay = ({ category }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
      {filteredSarees.length > 0 ? (
-  filteredSarees.map((s) => (
+  filteredSarees.map((s, index) => (
     <SareeItem
-      key={s._id}
+      key={s.id || s._id || `saree-${index}`}
+      id={s.id}
       _id={s._id}
       name={s.name}
       price={s.price}

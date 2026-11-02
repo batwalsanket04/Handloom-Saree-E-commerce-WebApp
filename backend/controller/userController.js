@@ -1,5 +1,6 @@
 import userModel from "../models/userModel.js";
 import sareeModel from "../models/sareeModel.js";
+import orderModel from "../models/orderModel.js";
 import RefreshToken from "../models/refreshtoken.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -360,6 +361,300 @@ const removeFromWishlist = async (req, res) => {
   }
 };
 
+// Update user profile (name, phone, address)
+const updateProfile = async (req, res) => {
+  try {
+    const { name, phone, address } = req.body;
+    const user = await userModel.findByPk(req.userId);
+    if (!user) return handleError(res, 404, "User not found");
+
+    const updateData = {};
+    if (name !== undefined) updateData.name = name.trim();
+    if (phone !== undefined) updateData.phone = phone;
+    if (address !== undefined) updateData.address = address;
+
+    await user.update(updateData);
+    return res.json({
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+      },
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    return handleError(res, 500, "Error updating profile");
+  }
+};
+
+// Change user password
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await userModel.findByPk(req.userId);
+    if (!user) return handleError(res, 404, "User not found");
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return handleError(res, 400, "Current password is incorrect");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await user.update({ password: hashedPassword });
+
+    return res.json({ success: true, message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Change password error:", error);
+    return handleError(res, 500, "Error changing password");
+  }
+};
+
+// Get saved addresses
+const getAddresses = async (req, res) => {
+  try {
+    const user = await userModel.findByPk(req.userId, {
+      attributes: ["address"],
+    });
+    if (!user) return handleError(res, 404, "User not found");
+
+    let addresses = [];
+    if (user.address) {
+      try {
+        addresses = typeof user.address === "string" ? JSON.parse(user.address) : user.address;
+      } catch {
+        addresses = [];
+      }
+    }
+
+    return res.json({ success: true, addresses });
+  } catch (error) {
+    console.error("Get addresses error:", error);
+    return handleError(res, 500, "Error fetching addresses");
+  }
+};
+
+// Add a new address
+const addAddress = async (req, res) => {
+  try {
+    const { street, city, state, pincode, isDefault } = req.body;
+    const user = await userModel.findByPk(req.userId);
+    if (!user) return handleError(res, 404, "User not found");
+
+    let addresses = [];
+    if (user.address) {
+      try {
+        addresses = typeof user.address === "string" ? JSON.parse(user.address) : user.address;
+      } catch {
+        addresses = [];
+      }
+    }
+
+    const newAddress = {
+      id: Date.now(),
+      street,
+      city,
+      state,
+      pincode,
+      isDefault: isDefault !== undefined ? isDefault : addresses.length === 0,
+      createdAt: new Date().toISOString(),
+    };
+
+    if (newAddress.isDefault) {
+      addresses = addresses.map((a) => ({ ...a, isDefault: false }));
+    }
+
+    addresses.push(newAddress);
+    await user.update({ address: JSON.stringify(addresses) });
+
+    return res.json({
+      success: true,
+      message: "Address added successfully",
+      addresses,
+    });
+  } catch (error) {
+    console.error("Add address error:", error);
+    return handleError(res, 500, "Error adding address");
+  }
+};
+
+// Remove an address
+const removeAddress = async (req, res) => {
+  try {
+    const { addressId } = req.params;
+    const user = await userModel.findByPk(req.userId);
+    if (!user) return handleError(res, 404, "User not found");
+
+    let addresses = [];
+    if (user.address) {
+      try {
+        addresses = typeof user.address === "string" ? JSON.parse(user.address) : user.address;
+      } catch {
+        addresses = [];
+      }
+    }
+
+    addresses = addresses.filter((a) => String(a.id) !== String(addressId));
+    await user.update({ address: JSON.stringify(addresses) });
+
+    return res.json({
+      success: true,
+      message: "Address removed successfully",
+      addresses,
+    });
+  } catch (error) {
+    console.error("Remove address error:", error);
+    return handleError(res, 500, "Error removing address");
+  }
+};
+
+// Get payment methods (derived from orders + stored methods)
+const getPaymentMethods = async (req, res) => {
+  try {
+    const user = await userModel.findByPk(req.userId, {
+      attributes: ["paymentMethods"],
+    });
+    if (!user) return handleError(res, 404, "User not found");
+
+    let methods = [];
+    if (user.paymentMethods) {
+      try {
+        methods = typeof user.paymentMethods === "string" ? JSON.parse(user.paymentMethods) : user.paymentMethods;
+      } catch {
+        methods = [];
+      }
+    }
+
+    return res.json({ success: true, paymentMethods: methods });
+  } catch (error) {
+    console.error("Get payment methods error:", error);
+    return handleError(res, 500, "Error fetching payment methods");
+  }
+};
+
+// Add a payment method
+const addPaymentMethod = async (req, res) => {
+  try {
+    const { cardName, cardNumber, expiry, cvv, isDefault } = req.body;
+    const user = await userModel.findByPk(req.userId);
+    if (!user) return handleError(res, 404, "User not found");
+
+    let methods = [];
+    if (user.paymentMethods) {
+      try {
+        methods = typeof user.paymentMethods === "string" ? JSON.parse(user.paymentMethods) : user.paymentMethods;
+      } catch {
+        methods = [];
+      }
+    }
+
+    const newMethod = {
+      id: Date.now(),
+      cardName,
+      cardNumber: `**** **** **** ${cardNumber.slice(-4)}`,
+      expiry,
+      isDefault: isDefault !== undefined ? isDefault : methods.length === 0,
+      createdAt: new Date().toISOString(),
+    };
+
+    if (newMethod.isDefault) {
+      methods = methods.map((m) => ({ ...m, isDefault: false }));
+    }
+
+    methods.push(newMethod);
+    await user.update({ paymentMethods: JSON.stringify(methods) });
+
+    return res.json({
+      success: true,
+      message: "Payment method added successfully",
+      paymentMethods: methods,
+    });
+  } catch (error) {
+    console.error("Add payment method error:", error);
+    return handleError(res, 500, "Error adding payment method");
+  }
+};
+
+// Remove a payment method
+const removePaymentMethod = async (req, res) => {
+  try {
+    const { methodId } = req.params;
+    const user = await userModel.findByPk(req.userId);
+    if (!user) return handleError(res, 404, "User not found");
+
+    let methods = [];
+    if (user.paymentMethods) {
+      try {
+        methods = typeof user.paymentMethods === "string" ? JSON.parse(user.paymentMethods) : user.paymentMethods;
+      } catch {
+        methods = [];
+      }
+    }
+
+    methods = methods.filter((m) => String(m.id) !== String(methodId));
+    await user.update({ paymentMethods: JSON.stringify(methods) });
+
+    return res.json({
+      success: true,
+      message: "Payment method removed successfully",
+      paymentMethods: methods,
+    });
+  } catch (error) {
+    console.error("Remove payment method error:", error);
+    return handleError(res, 500, "Error removing payment method");
+  }
+};
+
+// Get transactions from user orders
+const getTransactions = async (req, res) => {
+  try {
+    const orders = await orderModel.findAll({
+      where: { userId: req.userId },
+      order: [["createdAt", "DESC"]],
+    });
+
+    const transactions = orders.map((order) => ({
+      id: order.id,
+      date: order.createdAt,
+      type: order.payment ? "Order Payment" : "Order Payment",
+      amount: order.payment ? `-₹${order.amount}` : `-₹${order.amount}`,
+      status: order.payment ? "Completed" : "Pending",
+      orderId: order.id,
+    }));
+
+    return res.json({ success: true, transactions });
+  } catch (error) {
+    console.error("Get transactions error:", error);
+    return handleError(res, 500, "Error fetching transactions");
+  }
+};
+
+// Get refunds (mock - orders with cancelled status)
+const getRefunds = async (req, res) => {
+  try {
+    const orders = await orderModel.findAll({
+      where: { userId: req.userId, status: "Cancelled" },
+      order: [["createdAt", "DESC"]],
+    });
+
+    const refunds = orders.map((order) => ({
+      id: order.id,
+      date: order.updatedAt || order.createdAt,
+      amount: `+₹${order.amount}`,
+      status: "Processed",
+      reason: "Order cancelled",
+    }));
+
+    return res.json({ success: true, refunds });
+  } catch (error) {
+    console.error("Get refunds error:", error);
+    return handleError(res, 500, "Error fetching refunds");
+  }
+};
+
 export {
   loginUser,
   registerUser,
@@ -372,4 +667,14 @@ export {
   getWishlist,
   addToWishlist,
   removeFromWishlist,
+  updateProfile,
+  changePassword,
+  getAddresses,
+  addAddress,
+  removeAddress,
+  getPaymentMethods,
+  addPaymentMethod,
+  removePaymentMethod,
+  getTransactions,
+  getRefunds,
 };
